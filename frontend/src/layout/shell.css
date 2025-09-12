@@ -1,0 +1,24 @@
+/* Full-height app with left sidebar and top bar */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+.app-shell {
+  display: flex;
+  height: 100%;
+  background: #f9fafb;
+}
+
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* prevents overflow issues */
+}
+
+.main-content {
+  flex: 1;
+  overflow: auto;
+  padding: 16px;
+}
