@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import axios from "axios";
 import Meeting from "../model/meeting.js";
-import { getZoomAccessToken } from "../Utilities/zoomAuth.js";
+import { getZoomAccessToken } from "../utils/zoomAuth.js";
 
 const RECORDINGS_DIR = process.env.RECORDINGS_DIR || "recordings";
 if (!fs.existsSync(RECORDINGS_DIR)) fs.mkdirSync(RECORDINGS_DIR, { recursive: true });
