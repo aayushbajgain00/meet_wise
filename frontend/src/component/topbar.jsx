@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { FaBell, FaAngleDown, FaSignOutAlt } from "react-icons/fa";
+import { FaBell, FaUpload } from "react-icons/fa";
 import "./topbar.css";
 
 export default function Topbar() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const userInitial = (localStorage.getItem("mw_user_initial") || "A").slice(0, 1);
+  const [open, setOpen] = useState(false);
+  const userInitial = (localStorage.getItem("mw_user_initial") || "M").slice(0, 1);
 
   const handleLogout = () => {
     localStorage.removeItem("mw_token");
@@ -13,40 +13,34 @@ export default function Topbar() {
 
   return (
     <header className="mw-topbar" role="banner">
-      {/* LEFT (spacer) */}
-      <div className="mw-left" aria-hidden="true" />
-
-      {/* CENTER (slogan) */}
+      {/* Centered slogan */}
       <div className="mw-center">
         <span className="mw-slogan">Never miss a word, Always stay wise</span>
       </div>
 
-      {/* RIGHT (actions) */}
+      {/* Right: Bell • Upload • Avatar • Logout */}
       <div className="mw-right">
-        {/* Notifications */}
-        <button className="icon-btn" title="Notifications" aria-label="Notifications">
+        <button className="icon-btn" aria-label="Notifications" title="Notifications">
           <FaBell />
           <span className="dot" />
         </button>
 
-        {/* Profile */}
-        <div className="avatar" title="Profile" aria-label="Profile">
-          {userInitial}
-        </div>
+        <a className="btn upload-link" href="/upload">
+          <FaUpload style={{ marginRight: 6 }} /> Upload
+        </a>
 
-        {/* Logout */}
+        <div className="avatar" title="Profile">{userInitial}</div>
+
         <div className="logout">
           <button
-            className="logout-btn"
-            onClick={() => setMenuOpen((v) => !v)}
+            className="btn outline"
+            onClick={() => setOpen(v => !v)}
             aria-haspopup="menu"
-            aria-expanded={menuOpen}
+            aria-expanded={open}
           >
-            <FaSignOutAlt style={{ marginRight: 6 }} />
-            Logout
-            <FaAngleDown style={{ marginLeft: 6 }} />
+            Logout ▾
           </button>
-          {menuOpen && (
+          {open && (
             <div className="logout-menu" role="menu">
               <button role="menuitem" onClick={handleLogout}>Sign out</button>
             </div>

@@ -382,6 +382,56 @@
   color: #3a63ff;
 }
 
+.mw-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.45);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+.mw-modal {
+  width: min(560px, 92vw);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  overflow: hidden;
+  animation: mw-pop 150ms ease-out;
+}
+@keyframes mw-pop {
+  from { transform: translateY(8px) scale(0.98); opacity: 0.6; }
+  to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+.mw-modal-header, .mw-modal-footer {
+  padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.mw-modal-header h3 { margin: 0; font-size: 18px; }
+.mw-modal-body { padding: 4px 20px 16px; }
+.mw-icon-btn {
+  background: transparent; border: none; font-size: 18px; line-height: 1;
+  cursor: pointer; opacity: 0.8;
+}
+.mw-icon-btn:hover { opacity: 1; }
+
+.mw-field { display: grid; gap: 8px; margin: 14px 0; }
+.mw-label { font-weight: 600; font-size: 13px; }
+.mw-optional { color: #6b7280; font-weight: 400; }
+.mw-field input, .mw-field select {
+  padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 10px; outline: none; font-size: 14px;
+}
+.mw-field input:focus, .mw-field select:focus {
+  border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
+}
+.mw-help { color: #6b7280; font-size: 12px; }
+.mw-error { color: #dc2626; font-size: 12px; margin-top: 4px; }
+
+.mw-btn { border: none; border-radius: 10px; padding: 10px 14px; font-weight: 600; cursor: pointer; }
+.mw-btn.ghost { background: #f3f4f6; }
+.mw-btn.primary { background: #4f46e5; color: #fff; }
+.mw-btn.primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+
 /* Responsive tweaks */
 @media (max-width: 1200px) {
   .meetings-body {
