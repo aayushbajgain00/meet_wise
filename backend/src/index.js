@@ -7,7 +7,7 @@ import BotRoutes from "./routes/botRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
 import { fileURLToPath } from "url";
 import path from "path"; 
-import webhookRoutes from "./routes/webhooks.js";
+import webhookRoutes from "./routes/webhook.js";
 
 
 
