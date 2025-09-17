@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
-import "./login.css"; // <-- add this import
+import AuthLayout from "./authLayout";
+import Button from "../component/button";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -71,81 +72,79 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        {/* Logo + Title */}
-        <div className="auth-header">
-          <img src="/logo.png" alt="Meetwise Logo" className="auth-logo" />
-          <h1 className="auth-title">Meetwise</h1>
-          <p className="auth-subtitle">Welcome back! Sign in to continue</p>
-        </div>
-
-        {/* Form */}
-        <form className="auth-form" onSubmit={submitHandler}>
-          {/* Email */}
-          <div className="form-row">
-            <label htmlFor="email" className="auth-label">
+    <AuthLayout>
+        <form className="space-y-5" onSubmit={submitHandler}>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Email address
             </label>
-            <div className="auth-input-group">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+              </div>
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="auth-input"
+                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your email"
-                autoComplete="email"
               />
-              <span className="auth-input-icon">
-                <i className="fas fa-envelope" aria-hidden="true" />
-              </span>
             </div>
           </div>
 
-          {/* Password */}
-          <div className="form-row">
-            <label htmlFor="password" className="auth-label">
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Password
             </label>
-            <div className="auth-input-group">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="auth-input"
+                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your password"
-                autoComplete="current-password"
               />
-              <span className="auth-input-icon">
-                <i className="fas fa-lock" aria-hidden="true" />
-              </span>
-            </div>
-
-            <div className="auth-right">
-              <Link to="/forgot-password" className="auth-link-small">
-                Forgot password?
-              </Link>
             </div>
           </div>
 
-          {/* Submit Button */}
-          <button type="submit" className="auth-btn" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
+          <Button loading={loading} name={"Login"} loadingName={"Logging in"}/>
         </form>
 
-        {/* Footer */}
-        <p className="auth-footer">
-          Don’t have an account?{" "}
-          <Link to="/signup" className="auth-link">
-            Sign up now
-          </Link>
-        </p>
-      </div>
-    </div>
+        <div className="mt-6 mb-4 flex flex-col items-start gap-4 text-center text-sm text-gray-600">
+          <p className="flex items-center justify-between w-full ">
+            Forgot Password?{" "}
+            <Link to="/reset-password" >
+              <span className="font-small underline hover:text-blue-500 transition-colors">
+                Reset it Here
+              </span>
+            </Link>
+          </p>
+          <div>
+            <Link to="/signup" >
+              <span className="underline hover:text-blue-500 transition-colors">
+                Create a New Account
+              </span>
+            </Link>
+
+          </div>
+        </div>
+    </AuthLayout>
   );
 }

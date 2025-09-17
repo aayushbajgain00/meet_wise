@@ -4,6 +4,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 // Public auth (no sidebar)
 import UserLogin from "./auth/login";
 import UserSignup from "./auth/signup";
+import ResetPassword from "./auth/resetPassword.jsx";
+import VerifyCode from "./auth/verifyCode.jsx";
+import ResetConfirm from "./auth/resetConfirm.jsx";
+import SetPassword from "./auth/setPassword.jsx";
 
 // Shared layout (sidebar + outlet)
 import Shell from "./layout/shell";
@@ -22,6 +26,10 @@ export default function App() {
         {/* Public routes */}
         <Route path="/login" element={<UserLogin />} />
         <Route path="/signup" element={<UserSignup />} />
+        <Route path="/reset-password" element={<ResetPassword/>} />
+        <Route path="/verify-code" element={<VerifyCode/>} />
+        <Route path="/reset-confirm" element={<ResetConfirm/>} />
+        <Route path="/set-password" element={<SetPassword/>} />
 
         <Route element={<Shell />}>
           <Route path="/" element={<HomePage />} />
