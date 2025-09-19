@@ -1,3 +1,4 @@
+import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
@@ -28,7 +29,10 @@ export default function App() {
           <Route path="/meetings" element={<Meetings />} />
           <Route path="/meeting-status" element={<MeetingStatus />} />
           <Route path="/upload" element={<Upload />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route path="/settings/meeting" element={<Settings page="meeting" />} />
+          <Route path="/settings/profile" element={<Settings page="profile" />} />
+          <Route path="/settings/account" element={<Settings page="account" />} />
+          <Route path="/settings" element={<Settings page="meeting" />} />
         </Route>
 
         {/* Fallback */}
