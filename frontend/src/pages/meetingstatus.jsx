@@ -1,34 +1,36 @@
 import React, { useEffect, useState } from "react";
 import api from "../lib/api";
-import { useToast } from "../component/toastprovider"; // ✅ lowercase path
+import { useToast } from "../component/toastprovider";
 
 export default function MeetingStatus() {
   const toast = useToast();
-  const push = toast?.push ?? (() => {}); // ✅ safe fallback
+  const push = toast?.push ?? (() => {});
 
-  const [jobs, setJobs] = useState([]);
+  const [meetings, setMeetings] = useState([]);
 
   const load = async () => {
     try {
-      const { data } = await api.get("/jobs");
-      setJobs(data || []);
+      const { data } = await api.get("/meetings/status");
+      setMeetings(data || []);
     } catch (e) {
-      push("Could not load jobs (backend not reachable)", "error");
-      // Mock data so UI still shows
-      setJobs([
-        { id: "job123", status: "processing" },
-        { id: "job124", status: "failed", error: "Timeout contacting Zoom" },
+      push("Could not load meetings (backend not reachable)", "error");
+      // Mock data for UI
+      setMeetings([
+        {
+          id: "1",
+          title: "Team Sync",
+          date: "28 Aug 25",
+          duration: "45 mins",
+          status: "Completed",
+        },
+        {
+          id: "2",
+          title: "Client Meeting",
+          date: "25 Aug 25",
+          duration: "1 hr",
+          status: "Completed",
+        },
       ]);
-    }
-  };
-
-  const retry = async (id) => {
-    try {
-      await api.post(`/jobs/${id}/retry`);
-      push("Retry triggered", "success");
-      load();
-    } catch {
-      push("Retry failed", "error");
     }
   };
 
@@ -38,28 +40,61 @@ export default function MeetingStatus() {
 
   return (
     <div className="container">
-      <h1>Meeting Status</h1>
-      <div className="card" style={{ display: "grid", gap: 8 }}>
-        {jobs.map((j) => (
-          <div
-            key={j.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <b>{j.id}</b> — {j.status} {j.error ? `• ${j.error}` : ""}
-            </div>
-            {j.status === "failed" && (
-              <button className="btn" onClick={() => retry(j.id)}>
-                Retry
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+      <h1>Meeting status</h1>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          marginTop: 16,
+        }}
+      >
+        <thead>
+          <tr>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "8px",
+              }}
+            >
+              Title
+            </th>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "8px",
+              }}
+            >
+              Date
+            </th>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "8px",
+              }}
+            >
+              Duration
+            </th>
+            <th
+              style={{
+                textAlign: "left",
+                padding: "8px",
+              }}
+            >
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {meetings.map((m) => (
+            <tr key={m.id}>
+              <td style={{ padding: "8px" }}>{m.title}</td>
+              <td style={{ padding: "8px" }}>{m.date}</td>
+              <td style={{ padding: "8px" }}>{m.duration}</td>
+              <td style={{ padding: "8px" }}>{m.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

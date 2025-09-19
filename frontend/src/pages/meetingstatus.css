@@ -1,0 +1,51 @@
+.container {
+  padding: 32px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 24px;
+  font-weight: 600;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  padding: 12px 8px;
+  text-align: left;
+}
+
+th {
+  font-weight: 500;
+  color: #333;
+  border-bottom: 2px solid #eee;
+}
+
+tr {
+  border-bottom: 1px solid #f3f3f3;
+}
+
+tr:last-child {
+  border-bottom: none;
+}
+
+td {
+  color: #444;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 12px;
+  }
+  th, td {
+    padding: 8px 4px;
+    font-size: 0.95rem;
+  }
+}
