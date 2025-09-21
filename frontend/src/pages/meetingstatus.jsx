@@ -162,8 +162,6 @@ export default function MeetingStatusPage() {
     <div className="mw-container">
       <header className="mw-header">
         <h1>Meeting status</h1>
-
-
         <p className="mw-sub">Track meetings and see their current state.</p>
       </header>
 
