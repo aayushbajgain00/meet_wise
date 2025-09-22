@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import AuthLayout from "./authLayout";
+import Button from "../component/button";
 
 export default function Signup() {
   const [loading, setLoading] = useState(false);
@@ -73,112 +75,100 @@ export default function Signup() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
-        {/* Logo + Title */}
-        <div className="flex flex-col items-center mb-6">
-          <img src="/logo.png" alt="Meetwise Logo" className="w-12 h-12 mb-2" />
-          <h1 className="text-2xl font-bold text-blue-700">Meetwise</h1>
-          <p className="text-sm text-blue-500">
-            Never miss a word, Always stay wise
-          </p>
-        </div>
-
-        {/* Form */}
-        <form className="space-y-4" onSubmit={submitHandler}>
-          {/* Name */}
+    <AuthLayout>
+        <form className="space-y-5" onSubmit={submitHandler}>
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Name
             </label>
-            <div className="relative mt-1">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </div>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autoComplete="name"
+                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your name"
               />
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                <i className="fas fa-user" />
-              </span>
             </div>
           </div>
 
-          {/* Email */}
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Email address
             </label>
-            <div className="relative mt-1">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                </svg>
+              </div>
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={email}
+                autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your email"
               />
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                <i className="fas fa-envelope" />
-              </span>
             </div>
           </div>
 
-          {/* Password */}
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Password
             </label>
-            <div className="relative mt-1">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+              </div>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                autoComplete="current-password"
+                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your password"
               />
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
-                <i className="fas fa-lock" />
-              </span>
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-2 text-xs text-gray-500">
               Must be at least 8 characters
             </p>
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-gradient-to-r from-blue-400 to-blue-600 py-2 text-white font-semibold shadow-md hover:opacity-90 transition"
-          >
-            {loading ? "Signing up..." : "Sign Up"}
-          </button>
+          <Button loading={loading} name={"Sign Up"} loadingName={"Signing up"}/>
         </form>
 
-        {/* Footer */}
-        <p className="mt-6 text-center text-sm text-gray-600">
+        <p className="mt-6 mb-4 flex w-full items-center justify-between text-center text-sm text-gray-600">
           Already a member?{" "}
-          <Link to="/login" className="font-medium text-blue-600 hover:underline">
-            Sign in to your account
+          <Link to="/login" >
+            <span className="font-small underline hover:text-blue-500 transition-colors">
+              Sign in to your account
+            </span>
           </Link>
         </p>
-      </div>
-    </div>
-  );
+    </AuthLayout>
+  );
 }
