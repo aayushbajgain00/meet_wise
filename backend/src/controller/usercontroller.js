@@ -1,4 +1,6 @@
+import axios from "axios";
 import User from "../model/user.js";
+import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res, next) => {
   try {
@@ -48,3 +50,74 @@ export const loginUser = async (req, res, next) => {
     next(err);
   }
 };
+
+export const microsoftLogin = async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+
+    const microsoftUser = await verifyMicrosoftToken(accessToken);
+    let user = await User.findOne({ email: microsoftUser.email });
+
+    if (!user) {
+      user = new User({
+        email: microsoftUser.email,
+        name: microsoftUser.name,
+        isVerified: true,
+        authProvider: 'microsoft',
+        microsoftId: microsoftUser.id
+      });
+      await user.save();
+    }
+
+    const token = jwt.sign(
+      { 
+        userId: user._id,
+        email: user.email 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      success: true,
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        isVerified: user.isVerified,
+        token: token
+      }
+    });
+
+  } catch (error) {
+    console.error('Microsoft login error:', error);
+    res.status(401).json({
+      success: false,
+      message: 'Microsoft authentication failed'
+    });
+  }
+};
+
+const verifyMicrosoftToken = async (accessToken) => {
+  try {
+    const response = await axios.get('https://graph.microsoft.com/v1.0/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    const userData = response.data;
+    
+    return {
+      id: userData.id,
+      email: userData.mail || userData.userPrincipalName,
+      name: userData.displayName,
+      givenName: userData.givenName,
+      surname: userData.surname
+    };
+
+  } catch (error) {
+    console.error('Token verification error:', error);
+    throw new Error('Invalid Microsoft token');
+  }
+}
