@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Shell from "./component/Shell.jsx";
+import Shell from "./component/shell.jsx";
 
 // Public (no sidebar)
 import UserLogin from "./auth/login";
