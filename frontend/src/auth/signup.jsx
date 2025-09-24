@@ -96,6 +96,7 @@ export default function Signup() {
                 name="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                autoComplete="name"
                 className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your name"
               />
@@ -120,6 +121,7 @@ export default function Signup() {
                 id="email"
                 name="email"
                 value={email}
+                autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your email"
@@ -146,6 +148,7 @@ export default function Signup() {
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
                 className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
                 placeholder="Enter your password"
               />

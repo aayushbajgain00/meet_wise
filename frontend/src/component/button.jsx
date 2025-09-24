@@ -5,7 +5,7 @@ const Button = ({loading, name, loadingName}) => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-[url('./buttonImg.png')] bg-cover rounded-br-2xl rounded-bl-2xl py-3 px-4 text-white font-large shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-70`}
+            className={`w-full bg-[url('./buttonImg.png')] bg-cover rounded-br-2xl rounded-bl-2xl py-3 px-4 text-white font-large cursor-pointer shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-70`}
           >
             {loading ? (
               <span className="flex items-center justify-center">

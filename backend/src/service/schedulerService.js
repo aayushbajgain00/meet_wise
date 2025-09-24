@@ -18,6 +18,7 @@ cron.schedule("* * * * *", async () => {
         console.log("👉 Calling joinZoomMeeting now...");
       // await joinZoomMeeting("987654321", "xyz789");
       console.log("👉 joinZoomMeeting finished/returned");
+    //   await joinZoomMeeting(m.meetingId, m.password);
       m.status = "joining";
       await m.save();
     } catch (err) {

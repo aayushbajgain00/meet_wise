@@ -9,6 +9,8 @@ import BotRoutes from "./routes/botRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import webhookRoutes from "./routes/webhook.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
+import schedulerRoutes from "./routes/schedulerRoutes.js";
+import "./service/schedulerService.js";
 
 dotenv.config();
 const app = express();
@@ -34,6 +36,7 @@ app.use("/webhooks", webhookRoutes);
 app.use("/bots", BotRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/meetings", meetingRoutes);
+app.use("/scheduler", schedulerRoutes);
 
 // MongoDB connection
 const MONGO_URI = process.env.MONGO_URI;

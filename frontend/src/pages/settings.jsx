@@ -1,21 +1,14 @@
-export default function Settings() {
-  return (
-    <div className="container">
-      <h1>Settings</h1>
 
-      <section className="card" style={{ marginTop:12 }}>
-        <h3>Consent & Notifications</h3>
-        <label style={{ display:"flex", gap:8, alignItems:"center" }}>
-          <input type="checkbox" /> Require consent before recording
-        </label>
-        <label style={{ display:"flex", gap:8, alignItems:"center" }}>
-          <input type="checkbox" /> Auto-notify participants via email
-        </label>
-        <label style={{ display:"flex", gap:8, alignItems:"center" }}>
-          <input type="checkbox" /> Show in-app banner when recording starts
-        </label>
-        <button className="btn" style={{ marginTop:8 }}>Save</button>
-      </section>
-    </div>
-  );
+import React, { useState } from "react";
+import "./settings.css";
+import MeetingSetting from "./MeetingSetting";
+import ProfileSetting from "./ProfileSetting";
+import AccountSettings from "./AccountSettings";
+
+export default function Settings({ page }) {
+	// page prop should be 'meeting', 'profile', or 'account' based on the route
+	if (page === "meeting") return <MeetingSetting />;
+	if (page === "profile") return <ProfileSetting />;
+	if (page === "account") return <AccountSettings />;
+	return null;
 }
