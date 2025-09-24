@@ -1,15 +1,8 @@
-// src/component/Shell.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
-  FaHome,
-  FaVideo,
-  FaRegFileAlt,
-  FaCalendarAlt,
-  FaCog,
-  FaSignOutAlt,
-  FaChevronDown,
-  FaChevronUp,
+  FaHome, FaVideo, FaRegFileAlt, FaCalendarAlt,
+  FaCog, FaSignOutAlt, FaChevronDown, FaChevronUp
 } from "react-icons/fa";
 import { useMsal } from "@azure/msal-react";
 
@@ -18,13 +11,12 @@ function Topbar() {
   return (
     <header className="relative bg-white">
       <div className="mx-auto flex h-24 max-w-[1280px] items-center px-4 sm:px-6">
-        {/* Logo only (fixed ~40px) */}
+        {/* Logo (~40px) */}
         <a href="/" className="flex items-center">
           <img
             src="/meetwise-logo.png"
             alt="Meetwise"
             className="h-45 w-auto object-contain -ml-1"
-            loading="lazy"
           />
         </a>
 
@@ -40,19 +32,13 @@ function Topbar() {
   );
 }
 
-/* -------------- Helpers -------------- */
-const activePill =
-  "relative bg-white ring-1 ring-[#cfe0ff] text-[#0f3d8d] shadow-sm before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-6 before:w-1.5 before:rounded-r-full before:bg-[#4F83E0]";
-const baseRow =
-  "flex items-center gap-3 rounded-xl px-4 py-3 transition-colors font-semibold text-[#111827] hover:bg-white/70";
-
-/* ---------------- Layout (Sidebar + Main) ---------------- */
+/* ---------------- Shell (Sidebar + Main) ---------------- */
 export default function Shell() {
   const navigate = useNavigate();
   const location = useLocation();
   const { instance, accounts } = useMsal();
 
-  // Profile display name: MSAL → localStorage → "User"
+  // Name from MSAL → localStorage → fallback
   const activeAcc = instance.getActiveAccount?.() || accounts?.[0];
   const profileName =
     activeAcc?.name ||
@@ -61,7 +47,7 @@ export default function Shell() {
     "User";
   const userInitial = (profileName || "U").slice(0, 1).toUpperCase();
 
-  // Menu model
+  // Menu model with dropdowns
   const menu = useMemo(
     () => [
       { to: "/", label: "Dashboard", icon: <FaHome /> },
@@ -91,7 +77,7 @@ export default function Shell() {
     []
   );
 
-  // Dropdown open state – auto-opens based on current route
+  // Dropdown open state – auto-open on route
   const [meetingsOpen, setMeetingsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   useEffect(() => {
@@ -103,6 +89,12 @@ export default function Shell() {
     localStorage.removeItem("mw_token");
     navigate("/login");
   };
+
+  // Tailwind utility groups
+  const activePill =
+    "relative bg-white ring-1 ring-[#cfe0ff] text-[#0f3d8d] shadow-sm before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-6 before:w-1.5 before:rounded-r-full before:bg-[#4F83E0]";
+  const baseRow =
+    "flex items-center gap-3 rounded-xl px-4 py-3 transition-colors font-semibold text-[#111827] hover:bg-white/70";
 
   const ParentRow = ({ icon, label, open, setOpen, controlsId, isActive }) => (
     <button
@@ -136,7 +128,6 @@ export default function Shell() {
     </NavLink>
   );
 
-  // Active flags for parent rows
   const meetingsActive = location.pathname.startsWith("/meetings");
   const settingsActive = location.pathname.startsWith("/settings");
 
@@ -145,12 +136,12 @@ export default function Shell() {
       <Topbar />
 
       <div className="mx-auto grid max-w-[1280px] grid-cols-[280px_1fr] gap-4 px-2 sm:px-4">
-        {/* ---- Sidebar ---- */}
+        {/* Sidebar */}
         <aside className="px-3 pt-3">
-          {/* Full-height card: fills viewport under Topbar, with internal scroll for nav */}
           <div className="sticky top-3 w-[260px]">
+            {/* Full-height card with scrollable nav and footer logout */}
             <div className="flex h-[calc(100vh-24px)] flex-col overflow-hidden rounded-3xl border border-[#eee] bg-[#f5f3f3]/60 p-3 shadow-sm">
-              {/* Header */}
+              {/* Profile */}
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="grid h-10 w-10 place-items-center rounded-full bg-[#4F83E0] font-bold text-white">
@@ -165,7 +156,7 @@ export default function Shell() {
 
               <div className="mb-2 h-px w-full bg-[#eaeaea]" />
 
-              {/* Scrollable Nav */}
+              {/* Scrollable nav area */}
               <div className="relative flex-1 overflow-auto">
                 <nav className="flex flex-col gap-1 pr-1">
                   {/* Dashboard */}
@@ -176,13 +167,11 @@ export default function Shell() {
                       [baseRow, isActive ? activePill : ""].join(" ")
                     }
                   >
-                    <span className="text-[18px] text-[#232B3B]">
-                      <FaHome />
-                    </span>
+                    <span className="text-[18px] text-[#232B3B]"><FaHome /></span>
                     <span>Dashboard</span>
                   </NavLink>
 
-                  {/* Meetings */}
+                  {/* Meetings dropdown */}
                   <div className="rounded-xl px-1 py-1">
                     <ParentRow
                       icon={<FaVideo />}
@@ -208,9 +197,7 @@ export default function Shell() {
                       [baseRow, isActive ? activePill : ""].join(" ")
                     }
                   >
-                    <span className="text-[18px] text-[#232B3B]">
-                      <FaRegFileAlt />
-                    </span>
+                    <span className="text-[18px] text-[#232B3B]"><FaRegFileAlt /></span>
                     <span>Transcripts</span>
                   </NavLink>
 
@@ -222,15 +209,13 @@ export default function Shell() {
                       [baseRow, isActive ? activePill : ""].join(" ")
                     }
                   >
-                    <span className="text-[18px] text-[#232B3B]">
-                      <FaCalendarAlt />
-                    </span>
+                    <span className="text-[18px] text-[#232B3B]"><FaCalendarAlt /></span>
                     <span>Schedules</span>
                   </NavLink>
 
                   <div className="my-2 h-px w-full bg-[#eaeaea]" />
 
-                  {/* Settings */}
+                  {/* Settings dropdown */}
                   <div className="rounded-xl px-1 py-1">
                     <ParentRow
                       icon={<FaCog />}
@@ -251,16 +236,14 @@ export default function Shell() {
                 </nav>
               </div>
 
-              {/* Footer: Logout pinned at bottom */}
+              {/* Logout pinned to bottom */}
               <div className="mt-2">
                 <div className="mb-2 h-px w-full bg-[#eaeaea]" />
                 <button
-                  onClick={handleLogout}
+                  onClick={() => { localStorage.removeItem("mw_token"); navigate("/login"); }}
                   className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-semibold text-[#d24a43] hover:bg-white/70"
                 >
-                  <span className="text-[18px]">
-                    <FaSignOutAlt />
-                  </span>
+                  <span className="text-[18px]"><FaSignOutAlt /></span>
                   <span>Logout Account</span>
                 </button>
               </div>
@@ -268,7 +251,7 @@ export default function Shell() {
           </div>
         </aside>
 
-        {/* ---- Main content ---- */}
+        {/* Main routed content */}
         <main className="py-6">
           <Outlet />
         </main>
