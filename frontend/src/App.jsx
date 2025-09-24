@@ -8,14 +8,14 @@ import UserSignup from "./auth/signup";
 
 // Pages
 import HomePage from "./pages/homepage.jsx";
-import Meetings from "./pages/meetings.jsx";
+import AllMeetings from "./pages/Allmeeting.jsx";
+import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
 import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
 import Schedules from "./pages/Schedules.jsx";
 
-// Temporary placeholders (replace with real pages if you have them)
-const LiveMeeting = () => <div className="text-xl font-semibold">Add to Live meeting</div>;
+// Temporary placeholders (replace later if needed)
 const ProfileSettings = () => <div className="text-xl font-semibold">Profile Settings</div>;
 const MeetingSettings = () => <div className="text-xl font-semibold">Meetings Settings</div>;
 const AccountSettings = () => <div className="text-xl font-semibold">Account Settings</div>;
@@ -27,11 +27,11 @@ export default function App() {
       <Route path="/login" element={<UserLogin />} />
       <Route path="/signup" element={<UserSignup />} />
 
-      {/* App routes in Shell */}
+      {/* App routes inside Shell */}
       <Route element={<Shell />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/meetings" element={<Meetings />} />
-        <Route path="/meetings/live" element={<LiveMeeting />} />
+        <Route path="/meetings" element={<AllMeetings />} />
+        <Route path="/meetings/live" element={<AddLiveMeeting />} />
         <Route path="/transcripts" element={<Transcripts />} />
         <Route path="/schedules" element={<Schedules />} />
         <Route path="/upload" element={<Upload />} />
