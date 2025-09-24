@@ -1,0 +1,202 @@
+account-settings-wrapper {
+  width: 100%;
+  margin: 0;
+  padding: 24px;
+}
+
+.account-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.account-settings-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-settings-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.account-settings-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.account-settings-email {
+  color: #888;
+  font-size: 14px;
+}
+
+.account-settings-delete {
+  background: #ffdddd;
+  color: #d00;
+  border: none;
+  border-radius: 12px;
+  padding: 8px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.account-settings-delete:hover {
+  background: #ffcccc;
+}
+
+.account-settings-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+}
+
+/* Section Titles */
+.account-settings-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.account-settings-subtitle {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+/* Each section = flat row with divider */
+.account-settings-section {
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.account-settings-section:last-child {
+  border-bottom: none;
+}
+
+/* Fields */
+.account-settings-field {
+  margin-bottom: 16px;
+}
+
+.account-settings-field label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.account-settings-field input {
+  width: 100%;
+  padding: 10px;
+  background: #f9fafb;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Save / Action buttons */
+.account-settings-save,
+.account-settings-blue-btn,
+.account-settings-2fa-enable,
+.account-settings-subscription-btn {
+  display: inline-block;
+  padding: 10px 28px;
+  font-weight: 500;
+  font-size: 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.account-settings-save {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 8px 32px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.account-settings-save:hover {
+  background: #1741a6;
+}
+
+.account-settings-blue-btn,
+.account-settings-subscription-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.account-settings-blue-btn:hover,
+.account-settings-subscription-btn:hover {
+  background: #1741a6;
+}
+
+.account-settings-2fa-enable {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 16px;
+  padding: 8px 32px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.account-settings-2fa-enable:hover {
+  background: #1741a6;
+}
+
+/* 2FA Row */
+.account-settings-2fa-row2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.account-settings-2fa-title {
+  font-weight: bold;
+  font-size: 1.05em;
+  margin-bottom: 12px;
+}
+
+.account-settings-2fa-method {
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 2px;
+}
+
+.account-settings-2fa-desc2 {
+  color: #555;
+  font-size: 14px;
+}
+
+.account-settings-2fa-status {
+  background: #f3f4f6;
+  color: #555;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-weight: 500;
+  font-size: 0.95em;
+}
+
+.otp-status-disabled {
+  background: #f3f4f6;
+  color: #b91c1c;
+  border-radius: 10px;
+  padding: 8px 24px;
+  font-weight: 600;
+  font-size: 1.1em;
+  border: none;
+  cursor: not-allowed;
+}

@@ -8,7 +8,6 @@ import {
   FaVideo,
 } from "react-icons/fa";
 import { FiSearch } from "react-icons/fi";
-import "./meetings.css";
 
 /* ===========================
    Zoom-only helpers
