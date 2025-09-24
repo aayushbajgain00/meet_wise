@@ -1,0 +1,22 @@
+.meeting-settings-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  width: 100%;
+}
+
+.meeting-settings-title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.meeting-settings-section {
+  padding: 20px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.meeting-settings-section:last-child {
+  border-bottom: none;
+}
