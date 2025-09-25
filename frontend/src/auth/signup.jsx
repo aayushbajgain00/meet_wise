@@ -77,7 +77,7 @@ export default function Signup() {
       });
 
       Swal.fire({
-        title: "Account created successfully!",
+        title: "Account created successfully! Please log in.",
         icon: "success",
         toast: true,
         position: "top-right",
@@ -86,6 +86,8 @@ export default function Signup() {
       });
 
       setLoading(false);
+
+      // After signup → go to login page
       navigate("/login");
     } catch (error) {
       Swal.fire({
@@ -111,6 +113,7 @@ export default function Signup() {
           >
             Name
           </label>
+
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg
@@ -141,6 +144,7 @@ export default function Signup() {
           </div>
         </div>
 
+
         <div>
           <label
             htmlFor="email"
@@ -148,6 +152,7 @@ export default function Signup() {
           >
             Email address
           </label>
+
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg
@@ -185,6 +190,7 @@ export default function Signup() {
           >
             Password
           </label>
+
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg
@@ -213,6 +219,7 @@ export default function Signup() {
               placeholder="Enter your password"
             />
           </div>
+
           <p className="mt-2 text-xs text-gray-500">
             Must be at least 8 characters
           </p>
@@ -277,6 +284,7 @@ export default function Signup() {
           )}
         </button>
       </div>
+
     </AuthLayout>
   );
 }

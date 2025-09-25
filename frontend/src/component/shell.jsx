@@ -11,7 +11,6 @@ function Topbar() {
   return (
     <header className="relative bg-white">
       <div className="mx-auto flex h-24 max-w-[1280px] items-center px-4 sm:px-6">
-        {/* Logo (~40px) */}
         <a href="/" className="flex items-center">
           <img
             src="/meetwise-logo.png"
@@ -47,36 +46,6 @@ export default function Shell() {
     "User";
   const userInitial = (profileName || "U").slice(0, 1).toUpperCase();
 
-  // Menu model with dropdowns
-  const menu = useMemo(
-    () => [
-      { to: "/", label: "Dashboard", icon: <FaHome /> },
-      {
-        label: "Meetings",
-        icon: <FaVideo />,
-        base: "/meetings",
-        children: [
-          { to: "/meetings", label: "All meetings" },
-          { to: "/meetings/live", label: "Add to Live meeting" },
-        ],
-      },
-      { to: "/transcripts", label: "Transcripts", icon: <FaRegFileAlt /> },
-      { to: "/schedules", label: "Schedules", icon: <FaCalendarAlt /> },
-      { divider: true },
-      {
-        label: "Settings",
-        icon: <FaCog />,
-        base: "/settings",
-        children: [
-          { to: "/settings/profile", label: "Profile Settings" },
-          { to: "/settings/meeting", label: "Meetings Settings" },
-          { to: "/settings/account", label: "Account Settings" },
-        ],
-      },
-    ],
-    []
-  );
-
   // Dropdown open state – auto-open on route
   const [meetingsOpen, setMeetingsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -84,11 +53,6 @@ export default function Shell() {
     setMeetingsOpen(location.pathname.startsWith("/meetings"));
     setSettingsOpen(location.pathname.startsWith("/settings"));
   }, [location.pathname]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("mw_token");
-    navigate("/login");
-  };
 
   // Tailwind utility groups
   const activePill =
@@ -135,12 +99,11 @@ export default function Shell() {
     <div className="min-h-screen bg-white">
       <Topbar />
 
-      <div className="mx-auto grid max-w-[1280px] grid-cols-[280px_1fr] gap-4 px-2 sm:px-4">
+      <div className="mx-auto grid max-w-[1280px] grid-cols-[280px_1fr] gap-4 px-2 sm:px-4 h-[calc(100vh-96px)]">
         {/* Sidebar */}
         <aside className="px-3 pt-3">
-          <div className="sticky top-3 w-[260px]">
-            {/* Full-height card with scrollable nav and footer logout */}
-            <div className="flex h-[calc(100vh-24px)] flex-col overflow-hidden rounded-3xl border border-[#eee] bg-[#f5f3f3]/60 p-3 shadow-sm">
+          <div className="sticky top-3 w-[260px] h-full">
+            <div className="flex flex-col h-full rounded-3xl border border-[#eee] bg-[#f5f3f3]/60 p-3 shadow-sm">
               {/* Profile */}
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -157,7 +120,7 @@ export default function Shell() {
               <div className="mb-2 h-px w-full bg-[#eaeaea]" />
 
               {/* Scrollable nav area */}
-              <div className="relative flex-1 overflow-auto">
+              <div className="flex-1 overflow-y-auto">
                 <nav className="flex flex-col gap-1 pr-1">
                   {/* Dashboard */}
                   <NavLink
@@ -236,15 +199,17 @@ export default function Shell() {
                 </nav>
               </div>
 
-              {/* Logout pinned to bottom */}
-              <div className="mt-2">
-                <div className="mb-2 h-px w-full bg-[#eaeaea]" />
+              {/* Logout pinned at bottom */}
+              <div className="pt-2 border-t border-[#eaeaea]">
                 <button
-                  onClick={() => { localStorage.removeItem("mw_token"); navigate("/login"); }}
+                  onClick={() => {
+                    localStorage.removeItem("mw_token");
+                    navigate("/login");
+                  }}
                   className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-semibold text-[#d24a43] hover:bg-white/70"
                 >
                   <span className="text-[18px]"><FaSignOutAlt /></span>
-                  <span>Logout Account</span>
+                  <span>Logout </span>
                 </button>
               </div>
             </div>
@@ -252,7 +217,7 @@ export default function Shell() {
         </aside>
 
         {/* Main routed content */}
-        <main className="py-6">
+        <main className="flex-1 h-full py-6 px-4 overflow-auto">
           <Outlet />
         </main>
       </div>

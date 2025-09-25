@@ -60,19 +60,27 @@ export default function Login() {
       );
 
       if (data.success) {
+        const name =
+          data.user?.name ||
+          response.account?.name ||
+          response.account?.username ||
+          "User";
+
+        localStorage.setItem("mw_user_name", name);
+        localStorage.setItem("userInfo", JSON.stringify(data.user));
+
         Swal.fire({
-          title: "User successfully logged in with Microsoft",
+          title: "Logged in with Microsoft",
           icon: "success",
           toast: true,
           timer: 3000,
           position: "top-right",
           showConfirmButton: false,
         });
-        localStorage.setItem("userInfo", JSON.stringify(data.user));
+
         navigate("/homepage");
       }
     } catch (error) {
-      console.error("Microsoft login error:", error);
       Swal.fire({
         title: "Microsoft Login Failed",
         text: error.response?.data?.message || error.message,
@@ -86,6 +94,8 @@ export default function Login() {
       setMicrosoftLoading(false);
     }
   };
+
+  /* ---------------- Email + Password Login ---------------- */
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -120,15 +130,20 @@ export default function Login() {
           showConfirmButton: false,
         });
       } else {
+        const name = data.name || data.user?.name || email.split("@")[0] || "User";
+
+        localStorage.setItem("mw_user_name", name);
+        localStorage.setItem("userInfo", JSON.stringify(data));
+
         Swal.fire({
-          title: "User successfully logged in",
+          title: "Logged in successfully",
           icon: "success",
           toast: true,
           timer: 3000,
           position: "top-right",
           showConfirmButton: false,
         });
-        localStorage.setItem("userInfo", JSON.stringify(data));
+
         navigate("/homepage");
       }
     } catch (error) {
@@ -221,6 +236,8 @@ export default function Login() {
               placeholder="Enter your password"
             />
           </div>
+
+
         </div>
 
         <Button loading={loading} name={"Login"} loadingName={"Logging in"} />
