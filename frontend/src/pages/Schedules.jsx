@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { GoogleCalendar, MicrosoftOutlook } from '../component/svgs';
+import { GoogleCalendar, MicrosoftOutlook, ZoomLogo } from '../component/svgs';
 
 const Schedules = () => {
   const [calendarOptions, setCalendarOptions] = useState({
     google: false,
-    outlook: true
+    outlook: true,
+    zoom: false
   });
   const [isRedirecting, setIsRedirecting] = useState(false);
 
@@ -20,19 +21,27 @@ const Schedules = () => {
       url: 'https://outlook.office.com/calendar',
       icon: MicrosoftOutlook,
       description: 'Open your Outlook Calendar'
+    },
+    zoom: {
+      name: 'Zoom',
+      url: 'https://zoom.us/meeting/schedule',
+      icon: ZoomLogo,
+      description: 'Open your Zoom Meeting Scheduler'
     }
   };
 
   const toggleCalendarOption = (option) => {
     setCalendarOptions(prev => ({
       google: option === 'google' ? !prev.google : false,
-      outlook: option === 'outlook' ? !prev.outlook : false
+      outlook: option === 'outlook' ? !prev.outlook : false,
+      zoom: option === 'zoom' ? !prev.zoom : false
     }));
   };
 
   const handleContinue = async () => {
     const selectedCalendar = calendarOptions.google ? 'google' : 
-                            calendarOptions.outlook ? 'outlook' : null;
+                            calendarOptions.outlook ? 'outlook' : 
+                            calendarOptions.zoom ? 'zoom' : null;
 
     if (!selectedCalendar) {
       alert('Please select a calendar service to continue.');
@@ -53,11 +62,12 @@ const Schedules = () => {
   const getSelectedCalendar = () => {
     if (calendarOptions.google) return calendarConfigs.google;
     if (calendarOptions.outlook) return calendarConfigs.outlook;
+    if (calendarOptions.zoom) return calendarConfigs.zoom;
     return null;
   };
 
   const selectedCalendar = getSelectedCalendar();
-
+  const isButtonDisabled = !calendarOptions.google && !calendarOptions.outlook && !calendarOptions.zoom;
   return (
     <div className="min-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg border border-gray-200">
       <h1 className="text-2xl font-bold mb-4 text-gray-800">Schedule Meetings</h1>
@@ -98,6 +108,22 @@ const Schedules = () => {
             Microsoft Outlook
           </span>
         </div>
+
+        <div 
+          className={`flex max-w-96 items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+            calendarOptions.zoom 
+              ? 'border-blue-500 bg-blue-50' 
+              : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+          }`}
+          onClick={() => toggleCalendarOption('zoom')}
+        >
+          <span className={`flex gap-2 items-center font-medium ${
+            calendarOptions.zoom ? 'text-blue-700' : 'text-gray-700'
+          }`}>
+            <ZoomLogo/>
+            Zoom
+          </span>
+        </div>
       </div>
 
       {selectedCalendar && (
@@ -118,7 +144,7 @@ const Schedules = () => {
         <button 
           onClick={handleContinue}
           className="px-6 py-2 bg-blue-800 text-white font-medium rounded-lg cursor-pointer hover:bg-blue-900 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
-          disabled={(!calendarOptions.google && !calendarOptions.outlook) || isRedirecting}
+          disabled={isButtonDisabled || isRedirecting}
         >
           {isRedirecting ? (
             <>
