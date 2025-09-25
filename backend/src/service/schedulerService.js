@@ -1,4 +1,3 @@
-// src/scheduler.js
 import cron from "node-cron";
 import ScheduledMeeting from "../model/schedule.js";
 import { joinZoomMeeting } from "../utils/ZoomPuppet.js";
@@ -14,11 +13,10 @@ cron.schedule("* * * * *", async () => {
   for (const m of dueMeetings) {
     try {
       console.log(`⏰ Time to join meeting ${m.meetingId}`);
+      console.log("👉 Calling joinZoomMeeting now...");
       await joinZoomMeeting(m.meetingId, m.password);
-        console.log("👉 Calling joinZoomMeeting now...");
-      // await joinZoomMeeting("987654321", "xyz789");
       console.log("👉 joinZoomMeeting finished/returned");
-    //   await joinZoomMeeting(m.meetingId, m.password);
+
       m.status = "joining";
       await m.save();
     } catch (err) {
