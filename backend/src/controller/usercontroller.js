@@ -16,7 +16,13 @@ export const registerUser = async (req, res, next) => {
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: "User already exists" });
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({
+      name,
+      email,
+      password,
+      authProvider: "local",
+      isVerified: true,
+    });
     return res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -37,6 +43,12 @@ export const loginUser = async (req, res, next) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
+    if (!user.password) {
+      return res.status(400).json({
+        message: "This account was created with social login. Please use that provider.",
+      });
+    }
+
     const ok = await user.matchPassword(password);
     if (!ok) return res.status(400).json({ message: "Invalid email or password" });
 
@@ -44,7 +56,9 @@ export const loginUser = async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      isVerified: true,
+      isVerified: user.isVerified,
+      authProvider: user.authProvider,
+      picture: user.picture,
     });
   } catch (err) {
     next(err);
@@ -93,10 +107,22 @@ export const microsoftLogin = async (req, res) => {
         email: microsoftUser.email,
         name: microsoftUser.name,
         isVerified: true,
-        authProvider: 'microsoft',
-        microsoftId: microsoftUser.id
+        authProvider: "microsoft",
+        microsoftId: microsoftUser.id,
       });
-      await user.save();
+    } else {
+      if (!user.microsoftId) user.microsoftId = microsoftUser.id;
+      if (!user.isVerified) user.isVerified = true;
+      if (!user.password) user.authProvider = "microsoft";
+    }
+
+    await user.save();
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "Missing JWT configuration",
+      });
     }
 
     const token = jwt.sign(
@@ -115,6 +141,8 @@ export const microsoftLogin = async (req, res) => {
         email: user.email,
         name: user.name,
         isVerified: user.isVerified,
+        authProvider: user.authProvider,
+        picture: user.picture,
         token: token
       }
     });
@@ -151,4 +179,3 @@ const verifyMicrosoftToken = async (accessToken) => {
     throw new Error('Invalid Microsoft token');
   }
 }
->>>>>>> 9768a55c222dc5de0fb375a68b1e6f3fe4d627cc
