@@ -65,7 +65,6 @@ export const loginUser = async (req, res, next) => {
   }
 };
 
-<<<<<<< HEAD
 // Update user profile
 export const updateProfile = async (req, res, next) => {
   try {
@@ -94,7 +93,7 @@ export const updateProfile = async (req, res, next) => {
     next(err);
   }
 };
-=======
+
 export const microsoftLogin = async (req, res) => {
   try {
     const { accessToken } = req.body;
@@ -179,3 +178,4 @@ const verifyMicrosoftToken = async (accessToken) => {
     throw new Error('Invalid Microsoft token');
   }
 }
+
