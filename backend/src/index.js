@@ -18,22 +18,22 @@ app.use(bodyParser.json());
 
 // Example route
 
-const MongoURI="mongodb+srv://985173_db_user:k09rX6a7JiqQAZyd@meetwise.sstjbaa.mongodb.net/?retryWrites=true&w=majority&appName=MeetWise"
-// const conn = await mongoose.connect(MangoURI, {
-//     useNewUrlParser: true,
-//       useUnifiedTopology: true,
-// })
-// if (conn) {
-//     console.log("Yeah its connected")
-// }
+
+const MongoURI = process.env.MONGO_URI;
+
+mongoose.connect(MongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  app.listen(5000, () => console.log("Server running on http://localhost:5000"));
+  console.log("Connected to MongoDB");
+})
+.catch(err => {
+  console.error("MongoDB connection error:", err);
+});
+
 
 app.use("/bots", BotRoutes)
 app.use("/api/user", userRoutes);
-
-// MongoDB connection
-await mongoose.connect(MongoURI)
-.then(() => {
-  app.listen(5000, () => console.log("Server running on http://localhost:5000"));
-})
-.catch(err => console.log(err));
 
