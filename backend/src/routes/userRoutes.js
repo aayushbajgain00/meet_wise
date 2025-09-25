@@ -1,6 +1,14 @@
 import { Router } from "express";
 
-import { registerUser, loginUser, microsoftLogin } from "../controller/usercontroller.js";
+import {
+  registerUser,
+  loginUser,
+  microsoftLogin,
+} from "../controller/usercontroller.js";
+import {
+  startGoogleOAuth,
+  handleGoogleOAuthCallback,
+} from "../controller/googleAuthController.js";
 
 const router = Router();
 
@@ -8,6 +16,8 @@ const router = Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/microsoft-login", microsoftLogin);
+router.get("/google", startGoogleOAuth);
+router.get("/google/callback", handleGoogleOAuthCallback);
 
 
 export default router;
