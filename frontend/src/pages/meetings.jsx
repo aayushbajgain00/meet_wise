@@ -1,4 +1,5 @@
-import React from "react";
+// Meetings.jsx (Zoom-only modal -> auto-join)
+import React, { useMemo, useState } from "react";
 import {
   FaHashtag,
   FaCalendarAlt,
@@ -9,16 +10,193 @@ import {
 import { FiSearch } from "react-icons/fi";
 import "./meetings.css";
 
-// 🔧 Put your real meeting info here (or load from env)
-const ZOOM_CONF_NO = "123456789";          // meeting ID
-const ZOOM_PWD = "abc123";                 // password (optional)
+/* ===========================
+   Zoom-only helpers
+=========================== */
 
-// Deep link into the Zoom desktop app
-const ZOOM_APP_URL = "zoommtg://zoom.us/";
-const ZOOM_WEB_URL = "https://zoom.us/start";
+// Name source: prop/localStorage/fallback
+const getDisplayName = (fallback = "Aayush") => {
+  try {
+    const s = localStorage.getItem("userName");
+    return (s && s.trim()) || fallback;
+  } catch {
+    return fallback;
+  }
+};
 
+// Extract {meetingId, pwd} from common Zoom link shapes
+// Accepts:
+// - https://zoom.us/j/123456789?pwd=abc123
+// - https://us02web.zoom.us/j/123456789?pwd=abc123
+// - https://zoom.us/wc/123456789/join?pwd=abc123
+// - https://zoom.us/s/123456789  (short link)
+// If the user pastes just digits, we treat it as the meeting ID.
+function parseZoomLink(raw) {
+  const val = (raw || "").trim();
+  if (!val) return { error: "Paste a Zoom meeting link." };
 
-export default function Meetings() {
+  // numeric only -> treat as ID
+  if (/^\d{7,}$/.test(val)) return { meetingId: val, pwd: "" };
+
+  let u;
+  try {
+    u = new URL(val);
+  } catch {
+    return { error: "Invalid URL. It must start with http(s)://" };
+  }
+
+  const host = u.hostname.toLowerCase();
+  if (!/(\.?)zoom\.us$/.test(host) && !/\.zoom\.us$/.test(host)) {
+    return { error: "Please provide a Zoom link (zoom.us)." };
+  }
+
+  let meetingId = "";
+  let pwd = u.searchParams.get("pwd") || "";
+
+  // /wc/{id}/join
+  const wcJoin = u.pathname.match(/\/wc\/(\d+)\/join/i);
+  if (wcJoin) meetingId = wcJoin[1];
+
+  // /j/{id}
+  const jMatch = u.pathname.match(/\/j\/(\d+)/i);
+  if (jMatch) meetingId = jMatch[1];
+
+  // /s/{id}
+  const sMatch = u.pathname.match(/\/s\/(\d+)/i);
+  if (sMatch) meetingId = sMatch[1];
+
+  if (!meetingId) {
+    // Last resort: if the path ends with numbers
+    const tail = u.pathname.match(/(\d+)$/);
+    if (tail) meetingId = tail[1];
+  }
+
+  if (!meetingId) {
+    return { error: "Could not find a meeting ID in this Zoom link." };
+  }
+  return { meetingId, pwd };
+}
+
+// Build app + web URLs for Zoom join
+function buildZoomJoinTargets({ meetingId, pwd, displayName }) {
+  const id = encodeURIComponent(meetingId);
+  const app =
+    `zoommtg://zoom.us/join?action=join&confno=${id}` +
+    (pwd ? `&pwd=${encodeURIComponent(pwd)}` : "");
+
+  // Web client goes straight to the join UI (not the marketing site)
+  const baseWeb = `https://zoom.us/wc/${id}/join`;
+  const qs = new URLSearchParams();
+  if (pwd) qs.set("pwd", pwd);
+  if (displayName) qs.set("uname", displayName);
+  const web = `${baseWeb}${qs.toString() ? `?${qs.toString()}` : ""}`;
+
+  return { appUrl: app, webUrl: web };
+}
+
+// Try Zoom app first; fall back to web client
+function openZoom(appUrl, webUrl) {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+  if (isIOS) {
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = appUrl;
+    document.body.appendChild(iframe);
+    setTimeout(() => (window.location.href = webUrl), 1200);
+    return;
+  }
+
+  window.location.href = appUrl;
+  setTimeout(() => (window.location.href = webUrl), 1200);
+}
+
+/* ===========================
+   Modal (Zoom-only)
+=========================== */
+function ZoomAddModal({ open, onClose, onStart, defaultLanguage = "English (Global)" }) {
+  const [meetingName, setMeetingName] = useState("");
+  const [meetingLink, setMeetingLink] = useState("");
+  const [language, setLanguage] = useState(defaultLanguage);
+  const [error, setError] = useState("");
+
+  const disabled = useMemo(() => meetingLink.trim().length === 0, [meetingLink]);
+
+  const handleStart = () => {
+    setError("");
+    const parsed = parseZoomLink(meetingLink);
+    if (parsed.error) {
+      setError(parsed.error);
+      return;
+    }
+    onStart({ meetingName: meetingName.trim(), parsed, language });
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="mw-modal-backdrop" role="dialog" aria-modal="true">
+      <div className="mw-modal">
+        <div className="mw-modal-header">
+          <h3>Add to live meeting</h3>
+          <button className="mw-icon-btn" aria-label="Close" onClick={onClose}>✕</button>
+        </div>
+
+        <div className="mw-modal-body">
+          <label className="mw-field">
+            <span className="mw-label">Name your meeting <span className="mw-optional">(Optional)</span></span>
+            <input
+              type="text"
+              placeholder="E.g. Product team sync"
+              value={meetingName}
+              onChange={(e) => setMeetingName(e.target.value)}
+            />
+          </label>
+
+          <label className="mw-field">
+            <span className="mw-label">Zoom meeting link (or ID)</span>
+            <input
+              type="text"
+              placeholder="Paste Zoom link (or just the meeting ID)"
+              value={meetingLink}
+              onChange={(e) => setMeetingLink(e.target.value)}
+              required
+            />
+            <small className="mw-help">Examples: https://zoom.us/j/123456789?pwd=abc123</small>
+            {error && <div className="mw-error">{error}</div>}
+          </label>
+
+          <label className="mw-field">
+            <span className="mw-label">Meeting language</span>
+            <select value={language} onChange={(e) => setLanguage(e.target.value)}>
+              <option>English (Global)</option>
+              <option>English (US)</option>
+              <option>English (UK)</option>
+              <option>Nepali</option>
+              <option>Hindi</option>
+              <option>Spanish</option>
+              <option>French</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="mw-modal-footer">
+          <button className="mw-btn ghost" onClick={onClose}>Cancel</button>
+          <button className="mw-btn primary" disabled={disabled} onClick={handleStart}>
+            Start Capturing
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===========================
+   Page
+=========================== */
+export default function Meetings({ userName = "Aayush" }) {
+  const [showModal, setShowModal] = useState(false);
+
   const channels = [
     { id: "mine", label: "My Meetings", active: true },
     { id: "all", label: "All Meetings", active: false },
@@ -36,15 +214,24 @@ export default function Meetings() {
     },
   ];
 
-  // 👉 Handler to open Zoom (app first, then web)
-  const handleAddLiveMeeting = () => {
-    // Try Zoom app deep link
-    const win = window.open(ZOOM_APP_URL, "_self"); // _self avoids popup blockers
-    // If the protocol is blocked or app missing, jump to web after a short delay
-    setTimeout(() => {
-      // Some browsers won't return a window reference with _self; just navigate.
-      window.location.href = ZOOM_WEB_URL;
-    }, 1200);
+  const handleOpenModal = () => setShowModal(true);
+  const handleCloseModal = () => setShowModal(false);
+
+  // When user clicks Start Capturing in the modal
+  const handleStart = ({ meetingName, parsed /* {meetingId,pwd} */, language }) => {
+    const displayName = (userName || getDisplayName("Aayush")).trim();
+
+    // (optional) send to backend before joining
+    // await api.post("/jobs", { meetingName, meetingId: parsed.meetingId, language });
+
+    const { appUrl, webUrl } = buildZoomJoinTargets({
+      meetingId: parsed.meetingId,
+      pwd: parsed.pwd,
+      displayName,
+    });
+
+    openZoom(appUrl, webUrl);
+    setShowModal(false);
   };
 
   return (
@@ -82,9 +269,7 @@ export default function Meetings() {
               <a
                 key={c.id}
                 href="#"
-                className={["channel-link", c.active && "active"]
-                  .filter(Boolean)
-                  .join(" ")}
+                className={["channel-link", c.active && "active"].filter(Boolean).join(" ")}
               >
                 <FaHashtag className="channel-hash" />
                 <span>{c.label}</span>
@@ -157,7 +342,7 @@ export default function Meetings() {
                 <FaCalendarAlt />
                 <span>Schedule</span>
               </button>
-              <button className="ghost" type="button" onClick={handleAddLiveMeeting}>
+              <button className="ghost" type="button" onClick={handleOpenModal}>
                 <FaVideo />
                 <span>Add to live meeting</span>
               </button>
@@ -169,6 +354,14 @@ export default function Meetings() {
           </div>
         </section>
       </div>
+
+      {/* Zoom-only modal */}
+      <ZoomAddModal open={showModal} onClose={handleCloseModal} onStart={handleStart} />
     </div>
   );
 }
+
+/* ===========================
+   Add these styles to meetings.css
+=========================== */
+/* Modal base */

@@ -1,33 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import "./homepage.css";
 
 export default function HomePage() {
-  return (
-    <>
-      {/* Search + Button */}
-      <div className="search-bar">
-        <input
-          type="text"
-          placeholder="Search by title or keyword..."
-          aria-label="Search by title or keyword"
-        />
-        <button type="button">Capture</button>
-      </div>
+  const [showBanner, setShowBanner] = useState(true);
 
-      {/* Welcome Card */}
-      <section className="welcome-card" aria-labelledby="welcome-title">
-        <div className="media">
-          <img
-            src="https://via.placeholder.com/600x300"
-            alt="Meetwise demo placeholder"
+  return (
+    <div className="hp">
+      {/* Search row + Capture button */}
+      <div className="hp-search-row">
+        <div className="hp-search">
+          <span className="hp-search-icon" aria-hidden="true">🔍</span>
+          <input
+            type="text"
+            placeholder="Search by title or keyword"
+            aria-label="Search by title or keyword"
           />
         </div>
-        <h2 id="welcome-title">Welcome Aboard, User! 🎉</h2>
-        <p>
-          Meetwise is ready to automate your meetings and streamline your
-          workflows. Let’s get started with smarter collaboration today.
-        </p>
+        <a className="hp-capture" href="/meeting-status">Capture</a>
+      </div>
+
+      {/* Thin blue divider */}
+      <div className="hp-divider" />
+
+      {/* Success pill */}
+      {showBanner && (
+        <div className="hp-success" role="status">
+          You Are Successfully Logged In
+        </div>
+      )}
+
+      {/* Hero with play + caption */}
+      <section className="hp-hero">
+        <div className="hp-hero-media">
+          <img
+            src="https://images.unsplash.com/photo-1587614382346-4ec70e388b28?q=80&w=1200&auto=format&fit=crop"
+            alt="Video guide"
+          />
+          <button className="hp-play" aria-label="Play video guide">▶</button>
+        </div>
+        <div className="hp-hero-caption">Video Guide to our website</div>
       </section>
-    </>
+
+      {/* Floating help button */}
+      <button className="hp-help" title="Help" aria-label="Help">?</button>
+    </div>
   );
 }

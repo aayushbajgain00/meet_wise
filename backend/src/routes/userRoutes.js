@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { registerUser, loginUser, updateProfile } from "../controller/usercontroller.js";
+import { registerUser, loginUser, microsoftLogin } from "../controller/usercontroller.js";
 
 const router = Router();
 
@@ -8,6 +8,7 @@ const router = Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.put("/profile", updateProfile);
+router.post("/microsoft-login", microsoftLogin);
 
 
 export default router;

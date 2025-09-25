@@ -6,11 +6,12 @@ const userSchema = mongoose.Schema(
     name: { type: String, require: true },
     email: { type: String, unique: true, require: true },
     password: { type: String, require: true },
-    username: { type: String, unique: true, sparse: true },
-    bio: { type: String, default: "" },
-    photo: { type: String, default: "" },
-    language: { type: String, default: "English" },
-    timezone: { type: String, default: "(GMT-05:00) Eastern Time" },
+    authProvider: {
+      type: String,
+      enum: ['local', 'microsoft'],
+      default: 'local'
+    },
+    microsoftId: String,
   });
 
   // Hash password before save
