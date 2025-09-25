@@ -5,15 +5,42 @@ import Swal from "sweetalert2";
 import AuthLayout from "./authLayout";
 import Button from "../component/button";
 import { useMsal } from "@azure/msal-react";
+import useGoogleAuth from "./useGoogleAuth";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [microsoftLoading, setMicrosoftLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
   const { instance } = useMsal();
+  const { startGoogleAuth, googleLoading } = useGoogleAuth({
+    onSuccess: ({ user, token }) => {
+      Swal.fire({
+        title: "Signed in with Google",
+        icon: "success",
+        toast: true,
+        timer: 3000,
+        position: "top-right",
+        showConfirmButton: false,
+      });
+
+      const session = { ...user, token };
+      localStorage.setItem("userInfo", JSON.stringify(session));
+      navigate("/homepage");
+    },
+    onError: (message) => {
+      Swal.fire({
+        title: "Google Login Failed",
+        text: message,
+        icon: "error",
+        toast: true,
+        timer: 4000,
+        position: "top-right",
+        showConfirmButton: false,
+      });
+    },
+  });
 
  const handleMicrosoftLogin = async () => {
     setMicrosoftLoading(true);
@@ -203,6 +230,9 @@ export default function Login() {
           </div>
           <div className="flex gap-3">
             <button
+              type="button"
+              onClick={startGoogleAuth}
+              disabled={googleLoading}
               className="flex items-center justify-center border border-blue-300 p-3 hover:bg-gray-100 hover:text-black hover:border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {googleLoading ? (

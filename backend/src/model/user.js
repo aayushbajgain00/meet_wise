@@ -1,30 +1,36 @@
-import mongoose from "mongoose"
-import bcrypt from "bcryptjs"
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
-    name: { type: String, require: true },
-    email: { type: String, unique: true, require: true },
-    password: { type: String, require: true },
+    name: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
+    password: { type: String },
     authProvider: {
       type: String,
-      enum: ['local', 'microsoft'],
-      default: 'local'
+      enum: ["local", "microsoft", "google"],
+      default: "local",
     },
     microsoftId: String,
-  });
+    googleId: { type: String, index: true },
+    picture: String,
+    isVerified: { type: Boolean, default: false },
+  },
+  { timestamps: true }
+);
 
-  // Hash password before save
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+  if (!this.isModified("password") || !this.password) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
-  // compare method
 userSchema.methods.matchPassword = function (entered) {
+  if (!this.password) return false;
   return bcrypt.compare(entered, this.password);
 };
+
 const User = mongoose.model("User", userSchema);
+
 export default User;
