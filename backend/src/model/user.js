@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+  name: { type: String },
     email: { type: String, unique: true, required: true },
     password: { type: String },
     authProvider: {
@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String, index: true },
     picture: String,
     isVerified: { type: Boolean, default: false },
+  username: { type: String },
+    bio: { type: String },
+    photo: { type: String },
+    language: { type: String },
+    timezone: { type: String },
   },
   { timestamps: true }
 );
