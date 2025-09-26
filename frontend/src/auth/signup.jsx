@@ -167,18 +167,9 @@ export default function Signup() {
           >
             Password
           </label>
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <PasswordIcon/>
-
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <PasswordIcon/>
             </div>
             <input
               type="password"
@@ -191,7 +182,6 @@ export default function Signup() {
               placeholder="Enter your password"
             />
           </div>
-
           <p className="mt-2 text-xs text-gray-500">
             Must be at least 8 characters
           </p>
