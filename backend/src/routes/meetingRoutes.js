@@ -2,14 +2,24 @@ import express from "express";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+import mongoose from "mongoose";
 import Meeting from "../model/meeting.js";
+import { transcribeRecording } from "../service/transcriptionService.js";
 
 const router = express.Router();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const recordingsDir = path.resolve(__dirname, "../../recordings");
+if (!fs.existsSync(recordingsDir)) {
+  fs.mkdirSync(recordingsDir, { recursive: true });
+}
 
 // Setup multer for uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "recordings/"); // backend/recordings
+    cb(null, recordingsDir); // backend/recordings
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
@@ -22,7 +32,7 @@ const upload = multer({ storage });
  * GET /meetings
  * List all meetings (latest first)
  */
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
   try {
     const items = await Meeting.find({}).sort({ createdAt: -1 });
     res.json(items);
@@ -55,8 +65,11 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
+    const generatedMeetingId = new mongoose.Types.ObjectId().toString();
+
     const newMeeting = await Meeting.create({
       platform: "zoom", // or detect
+      externalMeetingId: generatedMeetingId,
       topic: req.file.originalname,
       status: "recorded",
       recordings: [
@@ -75,6 +88,53 @@ router.post("/upload", upload.single("file"), async (req, res) => {
   } catch (err) {
     console.error("Error uploading file:", err);
     res.status(500).json({ message: "Upload failed" });
+  }
+});
+
+/**
+ * POST /meetings/transcribe
+ * Accept an audio/video file, transcribe it, and return structured text
+ */
+router.post("/transcribe", upload.single("file"), async (req, res) => {
+  console.log("Target Hit")
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  const tempFilePath = req.file.path;
+
+  try {
+    const transcription = await transcribeRecording({
+      filePath: tempFilePath,
+      originalName: req.file.originalname,
+      mimeType: req.file.mimetype,
+    });
+
+    res.json({
+      file: {
+        name: req.file.originalname,
+        mimeType: req.file.mimetype,
+        size: req.file.size,
+      },
+      transcript: {
+        text: transcription.text,
+        segments: transcription.segments || null,
+        language: transcription.language || transcription.lang || null,
+        duration: transcription.duration || null,
+        provider: transcription.provider || "openai",
+      },
+    });
+  } catch (error) {
+    console.error("Transcription failed:", error);
+    const status = error.statusCode || error.status || 500;
+    res.status(status).json({
+      message: error.message || "Transcription failed",
+      detail: error.detail || undefined,
+    });
+  } finally {
+    fs.promises
+      .unlink(tempFilePath)
+      .catch((err) => console.warn("Unable to remove temp file", err));
   }
 });
 
