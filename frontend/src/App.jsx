@@ -8,17 +8,17 @@ import UserSignup from "./auth/signup";
 
 // Pages
 import HomePage from "./pages/homepage.jsx";
+
 import AllMeetings from "./pages/Allmeeting.jsx";
 import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
 import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
 import Schedules from "./pages/Schedules.jsx";
+import MeetingSetting from "./pages/MeetingSetting.jsx";
+import ProfileSetting from "./pages/ProfileSetting.jsx";
+import AccountSetting from "./pages/AccountSetting.jsx";
 
-// Temporary placeholders (replace later if needed)
-const ProfileSettings = () => <div className="text-xl font-semibold">Profile Settings</div>;
-const MeetingSettings = () => <div className="text-xl font-semibold">Meetings Settings</div>;
-const AccountSettings = () => <div className="text-xl font-semibold">Account Settings</div>;
 
 export default function App() {
   return (
@@ -36,9 +36,9 @@ export default function App() {
         <Route path="/schedules" element={<Schedules />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/settings/profile" element={<ProfileSettings />} />
-        <Route path="/settings/meeting" element={<MeetingSettings />} />
-        <Route path="/settings/account" element={<AccountSettings />} />
+  <Route path="/settings/profile" element={<ProfileSetting />} />
+  <Route path="/settings/meeting" element={<MeetingSetting />} />
+  <Route path="/settings/account" element={<AccountSetting />} />
       </Route>
 
       {/* Fallback */}
