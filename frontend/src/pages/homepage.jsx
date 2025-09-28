@@ -6,19 +6,6 @@ export default function HomePage() {
 
   return (
     <div className="hp">
-      {/* Search row + Capture button */}
-      <div className="hp-search-row">
-        <div className="hp-search">
-          <span className="hp-search-icon" aria-hidden="true">🔍</span>
-          <input
-            type="text"
-            placeholder="Search by title or keyword"
-            aria-label="Search by title or keyword"
-          />
-        </div>
-        <a className="hp-capture" href="/meeting-status">Capture</a>
-      </div>
-
       {/* Thin blue divider */}
       <div className="hp-divider" />
 

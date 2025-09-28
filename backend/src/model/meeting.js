@@ -65,6 +65,12 @@ const MeetingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-MeetingSchema.index({ platform: 1, externalMeetingId: 1 }, { unique: true });
+MeetingSchema.index(
+  { platform: 1, externalMeetingId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { externalMeetingId: { $exists: true, $ne: null } },
+  }
+);
 
 export default mongoose.model("Meeting", MeetingSchema);
