@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Shell from "./component/shell.jsx";
+import ScheduleZoom from "./pages/ScheduleZoom.jsx";
 
 // Public (no sidebar)
 import UserLogin from "./auth/login";
@@ -14,6 +15,15 @@ import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
 import Schedules from "./pages/Schedules.jsx";
+<<<<<<< Updated upstream
+=======
+import AllMeetings from "./pages/allMeetings.jsx";
+import LiveMeeting from "./pages/LiveMeeting.jsx";
+import ApiPing from "./pages/ApiPing.jsx";
+import CreateZoomAndSchedule from "./pages/CreateZoomAndSchedule";
+
+// Temporary placeholders (replace with real pages if you have them)
+>>>>>>> Stashed changes
 
 // Temporary placeholders (replace later if needed)
 const ProfileSettings = () => <div className="text-xl font-semibold">Profile Settings</div>;
@@ -30,8 +40,15 @@ export default function App() {
       {/* App routes inside Shell */}
       <Route element={<Shell />}>
         <Route path="/" element={<HomePage />} />
+<<<<<<< Updated upstream
         <Route path="/meetings" element={<AllMeetings />} />
         <Route path="/meetings/live" element={<AddLiveMeeting />} />
+=======
+
+        <Route path="/meetings" element={<AllMeetings />} />
+        <Route path="/meetings/live" element={<LiveMeeting />} />
+
+>>>>>>> Stashed changes
         <Route path="/transcripts" element={<Transcripts />} />
         <Route path="/schedules" element={<Schedules />} />
         <Route path="/upload" element={<Upload />} />
@@ -39,6 +56,9 @@ export default function App() {
         <Route path="/settings/profile" element={<ProfileSettings />} />
         <Route path="/settings/meeting" element={<MeetingSettings />} />
         <Route path="/settings/account" element={<AccountSettings />} />
+        <Route path="/ping" element={<ApiPing />} />
+        {/* <Route path="/schedule" element={<ScheduleZoom />} /> */}
+        <Route path="/schedule" element={<CreateZoomAndSchedule />} />
       </Route>
 
       {/* Fallback */}

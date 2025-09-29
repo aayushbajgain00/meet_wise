@@ -52,6 +52,10 @@ export const loginUser = async (req, res, next) => {
     const ok = await user.matchPassword(password);
     if (!ok) return res.status(400).json({ message: "Invalid email or password" });
 
+    const z = user.zoomAuth;
+    const zoomConnected =
+      !!z?.accessToken && z?.expiresAt && new Date(z.expiresAt).getTime() > Date.now();
+
     return res.json({
       _id: user._id,
       name: user.name,
@@ -59,6 +63,11 @@ export const loginUser = async (req, res, next) => {
       isVerified: user.isVerified,
       authProvider: user.authProvider,
       picture: user.picture,
+
+      zoomConnected,
+      zoomScope: z?.scope || null,
+      zoomExpiresAt: z?.expiresAt || null,
+
     });
   } catch (err) {
     next(err);
@@ -96,9 +105,9 @@ export const microsoftLogin = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { 
+      {
         userId: user._id,
-        email: user.email 
+        email: user.email
       },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
@@ -126,6 +135,24 @@ export const microsoftLogin = async (req, res) => {
   }
 };
 
+export const autoRefresh = async (req, res) => {
+    const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const z = user.zoomAuth;
+  const zoomConnected =
+    !!z?.accessToken && z?.expiresAt && new Date(z.expiresAt).getTime() > Date.now();
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    zoomConnected,
+    zoomScope: z?.scope || null,
+    zoomExpiresAt: z?.expiresAt || null,
+  });
+}
+
 const verifyMicrosoftToken = async (accessToken) => {
   try {
     const response = await axios.get('https://graph.microsoft.com/v1.0/me', {
@@ -135,7 +162,7 @@ const verifyMicrosoftToken = async (accessToken) => {
     });
 
     const userData = response.data;
-    
+
     return {
       id: userData.id,
       email: userData.mail || userData.userPrincipalName,
@@ -149,3 +176,5 @@ const verifyMicrosoftToken = async (accessToken) => {
     throw new Error('Invalid Microsoft token');
   }
 }
+
+

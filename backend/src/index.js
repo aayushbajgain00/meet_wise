@@ -11,27 +11,56 @@ import webhookRoutes from "./routes/webhook.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
 import schedulerRoutes from "./routes/schedulerRoutes.js";
 import "./service/schedulerService.js";
+import zoomMeetingsRoutes from "./routes/zoomMeetingRoutes.js"
+import zoomUserAuthRoutes from "./routes/zoomUserAuthRoutes.js";
 
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors(
-  {
-    origin: [
-      "http://localhost:5173",
-      "http://127.0.0.1:5173",
-      "http://localhost:5174",
-      "http://127.0.0.1:5174",
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-    ],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }
-));
+// app.use(cors(
+//   {
+//     origin: [
+//       "http://localhost:5173",
+//       "http://127.0.0.1:5173",
+//       "http://localhost:5174",
+//       "http://127.0.0.1:5174",
+//       "http://localhost:3000",
+//       "http://127.0.0.1:3000",
+//       "https://58a442f3b33e.ngrok-free.app",
+//     ],
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   }
+// ));
+
+const ALLOWED_ORIGINS = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  
+  // "https://58a442f3b33e.ngrok-free.app", 
+];
+
+const corsOptions = {
+  origin: (origin, cb) => {
+    // allow tools like Postman/cURL (no Origin header)
+    if (!origin) return cb(null, true);
+    if (ALLOWED_ORIGINS.includes(origin)) return cb(null, true);
+    return cb(new Error(`CORS blocked for origin ${origin}`));
+  },
+  credentials: true, // required when frontend uses withCredentials
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "ngrok-skip-browser-warning", "X-User-Id"],
+  optionsSuccessStatus: 204,
+};
+
+// ✅ Single cors() use is enough; it also handles preflight in Express 5
+app.use(cors(corsOptions));
+
 app.use(express.json());
 
 // Health check
@@ -51,6 +80,8 @@ app.use("/bots", BotRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/meetings", meetingRoutes);
 app.use("/scheduler", schedulerRoutes);
+app.use("/zoom/meetings", zoomMeetingsRoutes);
+app.use("/zoom", zoomUserAuthRoutes);
 
 app.get("/", (req, res) => {
   res.send("Welcome to meetwise");

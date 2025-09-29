@@ -1,10 +1,11 @@
+// /src/lib/useGoogleAuth.js
 import { useCallback, useRef, useState } from "react";
-
 import api from "./api";
 
 const MESSAGE_TYPE = "google-auth";
 const POPUP_NAME = "google-oauth";
-const POPUP_FEATURES = "width=500,height=650,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+const POPUP_FEATURES =
+  "width=500,height=650,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
 
 export default function useGoogleAuth({ onSuccess, onError } = {}) {
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -25,7 +26,8 @@ export default function useGoogleAuth({ onSuccess, onError } = {}) {
 
   const startGoogleAuth = useCallback(() => {
     const backendBaseUrl = (api.defaults.baseURL || "http://localhost:5000").replace(/\/$/, "");
-    const authUrl = `${backendBaseUrl}/api/user/google`;
+    // Add the known query param to skip ngrok's browser warning page
+    const authUrl = `${backendBaseUrl}/api/user/google?ngrok-skip-browser-warning=1`;
     const backendOrigin = new URL(backendBaseUrl).origin;
 
     completedRef.current = false;
@@ -34,12 +36,16 @@ export default function useGoogleAuth({ onSuccess, onError } = {}) {
     const popup = window.open(authUrl, POPUP_NAME, POPUP_FEATURES);
     if (!popup) {
       setGoogleLoading(false);
-      onError?.("Unable to open Google sign-in window. Please disable your pop-up blocker and try again.");
+      onError?.(
+        "Unable to open Google sign-in window. Please disable your pop-up blocker and try again."
+      );
       return;
     }
 
     listenerRef.current = (event) => {
+      // Only trust messages from our backend origin (ngrok/localhost)
       if (event.origin !== backendOrigin) return;
+
       const { type, payload } = event.data || {};
       if (type !== MESSAGE_TYPE) return;
 
@@ -53,16 +59,17 @@ export default function useGoogleAuth({ onSuccess, onError } = {}) {
         onError?.(payload?.message || "Google authentication failed.");
       }
 
-      popup.close();
+      try {
+        popup.close();
+      } catch (_) {}
     };
 
     window.addEventListener("message", listenerRef.current);
 
+    // Watch for user closing the popup early
     timerRef.current = window.setInterval(() => {
       if (popup.closed) {
         cleanup();
-        window.clearInterval(timerRef.current);
-        timerRef.current = null;
         if (!completedRef.current) {
           setGoogleLoading(false);
           onError?.("Google sign-in was cancelled.");
