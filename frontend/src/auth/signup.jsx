@@ -4,13 +4,10 @@ import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import AuthLayout from "./authLayout";
 import Button from "../component/button";
-<<<<<<< Updated upstream
-import useGoogleAuth from "../lib/useGoogleAuth";
-=======
+
 import { EmailIcon, NameIcon, PasswordIcon } from "../component/svgs";
 import useGoogleAuth from "../lib/useGoogleAuth";
 import api from "../lib/api";
->>>>>>> Stashed changes
 
 export default function Signup() {
   const [loading, setLoading] = useState(false);
@@ -108,7 +105,6 @@ export default function Signup() {
     <AuthLayout>
       <form className="space-y-5" onSubmit={submitHandler}>
         <div>
-<<<<<<< Updated upstream
           <label
             htmlFor="name"
             className="block text-sm font-medium text-gray-700 mb-1"
@@ -132,14 +128,25 @@ export default function Signup() {
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 ></path>
               </svg>
-=======
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
             Name
           </label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <NameIcon />
->>>>>>> Stashed changes
+
+        <form className="space-y-5" onSubmit={submitHandler}>
+          <div>
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Name
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <NameIcon/>
+   
             </div>
             <input
               type="text"
@@ -154,15 +161,6 @@ export default function Signup() {
           </div>
         </div>
 
-<<<<<<< Updated upstream
-
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            Email address
-          </label>
 
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -180,7 +178,6 @@ export default function Signup() {
                   d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                 ></path>
               </svg>
-=======
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
             Email address
@@ -188,7 +185,17 @@ export default function Signup() {
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <EmailIcon />
->>>>>>> Stashed changes
+
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <EmailIcon/>
             </div>
             <input
               type="email"
@@ -207,10 +214,9 @@ export default function Signup() {
           <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
             Password
           </label>
-
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-<<<<<<< Updated upstream
+
               <svg
                 className="h-5 w-5 text-gray-600"
                 fill="none"
@@ -225,9 +231,9 @@ export default function Signup() {
                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                 ></path>
               </svg>
-=======
-              <PasswordIcon />
->>>>>>> Stashed changes
+
+ 
+              <PasswordIcon/>
             </div>
             <input
               type="password"
@@ -240,14 +246,12 @@ export default function Signup() {
               placeholder="Enter your password"
             />
           </div>
-<<<<<<< Updated upstream
 
           <p className="mt-2 text-xs text-gray-500">
             Must be at least 8 characters
           </p>
-=======
+
           <p className="mt-2 text-xs text-gray-500">Must be at least 8 characters</p>
->>>>>>> Stashed changes
         </div>
 
         <Button loading={loading} name={"Sign Up"} loadingName={"Signing up"} />
