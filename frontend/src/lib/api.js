@@ -1,13 +1,15 @@
 import axios from "axios";
 import { createRef } from "react";
 
-export const toastRef = createRef(); // set by ToastProvider
+export const toastRef = createRef(); 
 
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: (import.meta.env.VITE_API_BASE || "http://localhost:5000").replace(/\/$/, ""),
   withCredentials: true,
+  headers: { "Content-Type": "application/json" },
 });
 
+// Global error toast
 api.interceptors.response.use(
   (res) => res,
   (err) => {
@@ -18,3 +20,5 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+
