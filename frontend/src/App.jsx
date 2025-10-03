@@ -16,8 +16,8 @@ import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
 import Schedules from "./pages/Schedules.jsx";
-import AllMeetings from "./pages/allMeetings.jsx";
-import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
+
+
 import ProfileSetting from "./pages/ProfileSetting.jsx";
 import MeetingSetting from "./pages/MeetingSetting.jsx";
 import AccountSetting from "./pages/AccountSetting.jsx";
