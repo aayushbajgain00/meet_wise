@@ -18,11 +18,6 @@ import LiveMeeting from "./pages/LiveMeeting.jsx";
 import ApiPing from "./pages/ApiPing.jsx";
 import CreateZoomAndSchedule from "./pages/CreateZoomAndSchedule";
 
-
-import AllMeetings from "./pages/allMeetings.jsx";
-import LiveMeeting from "./pages/LiveMeeting.jsx";
-
-
 const ProfileSettings = () => <div className="text-xl font-semibold">Profile Settings</div>;
 const MeetingSettings = () => <div className="text-xl font-semibold">Meetings Settings</div>;
 const AccountSettings = () => <div className="text-xl font-semibold">Account Settings</div>;
@@ -38,7 +33,7 @@ export default function App() {
       <Route element={<Shell />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/meetings" element={<AllMeetings />} />
-        <Route path="/meetings/live" element={<AddLiveMeeting />} />
+        {/* <Route path="/meetings/live" element={<AddLiveMeeting />} /> */}
         <Route path="/meetings/live" element={<LiveMeeting />} />
         <Route path="/transcripts" element={<Transcripts />} />
         <Route path="/schedules" element={<Schedules />} />
