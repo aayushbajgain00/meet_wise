@@ -27,7 +27,7 @@ export default function Signup() {
       });
       const session = { ...user, token };
       localStorage.setItem("userInfo", JSON.stringify(session));
-      navigate("/homepage");
+      navigate("/app");
     },
     onError: (message) => {
       Swal.fire({
@@ -105,73 +105,78 @@ export default function Signup() {
       <form className="space-y-5" onSubmit={submitHandler}>
         {/* Name */}
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-            Name
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <NameIcon />
-            </div>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              autoComplete="name"
-              className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm 
-              focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
-              placeholder="Enter your name"
-            />
-          </div>
-        </div>
+<div>
+  <label
+    htmlFor="name"
+    className="block text-sm font-medium text-gray-700 mb-1"
+  >
+    Name
+  </label>
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <NameIcon />
+    </div>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      autoComplete="name"
+      className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
+      placeholder="Enter your name"
+    />
+  </div>
+</div>
 
-        {/* Email */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email address
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <EmailIcon />
-            </div>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm 
-              focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
-              placeholder="Enter your email"
-            />
-          </div>
-        </div>
+<div>
+  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+    Email address
+  </label>
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <EmailIcon />
+    </div>
+    <input
+      type="email"
+      id="email"
+      name="email"
+      value={email}
+      autoComplete="email"
+      onChange={(e) => setEmail(e.target.value)}
+      className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
+      placeholder="Enter your email"
+    />
+  </div>
+</div>
 
-        {/* Password */}
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-            Password
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <PasswordIcon />
-            </div>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm 
-              focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
-              placeholder="Enter your password"
-            />
-          </div>
-          <p className="mt-2 text-xs text-gray-500">Must be at least 8 characters</p>
-        </div>
+<div>
+  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+    Password
+  </label>
+  <div className="relative">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <PasswordIcon />
+    </div>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      autoComplete="current-password"
+      className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
+      placeholder="Enter your password"
+    />
+  </div>
+  <p className="mt-2 text-xs text-gray-500">
+    Must be at least 8 characters
+  </p>
+</div>
 
         {/* Submit button */}
         <Button loading={loading} name={"Sign Up"} loadingName={"Signing up"} />
+        </div>
       </form>
 
       {/* Already a member */}

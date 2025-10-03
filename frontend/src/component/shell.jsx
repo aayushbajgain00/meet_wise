@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome, FaVideo, FaRegFileAlt, FaCalendarAlt,
   FaCog, FaSignOutAlt, FaChevronDown, FaChevronUp
@@ -11,13 +11,13 @@ function Topbar() {
   return (
     <header className="relative bg-white">
       <div className="mx-auto flex h-24 max-w-[1280px] items-center px-4 sm:px-6">
-        <a href="/" className="flex items-center">
+        <Link to="/app" className="flex items-center">
           <img
             src="/meetwise-logo.png"
             alt="Meetwise"
             className="h-45 w-auto object-contain -ml-1"
           />
-        </a>
+        </Link>
 
         {/* Centered slogan */}
         <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -32,6 +32,8 @@ function Topbar() {
 }
 
 /* ---------------- Shell (Sidebar + Main) ---------------- */
+const APP_BASE = "/app";
+
 export default function Shell() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,8 +52,8 @@ export default function Shell() {
   const [meetingsOpen, setMeetingsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   useEffect(() => {
-    setMeetingsOpen(location.pathname.startsWith("/meetings"));
-    setSettingsOpen(location.pathname.startsWith("/settings"));
+    setMeetingsOpen(location.pathname.startsWith(`${APP_BASE}/meetings`));
+    setSettingsOpen(location.pathname.startsWith(`${APP_BASE}/settings`));
   }, [location.pathname]);
 
   // Tailwind utility groups
@@ -92,8 +94,8 @@ export default function Shell() {
     </NavLink>
   );
 
-  const meetingsActive = location.pathname.startsWith("/meetings");
-  const settingsActive = location.pathname.startsWith("/settings");
+  const meetingsActive = location.pathname.startsWith(`${APP_BASE}/meetings`);
+  const settingsActive = location.pathname.startsWith(`${APP_BASE}/settings`);
 
   return (
     <div className="min-h-screen bg-white">
@@ -124,7 +126,7 @@ export default function Shell() {
                 <nav className="flex flex-col gap-1 pr-1">
                   {/* Dashboard */}
                   <NavLink
-                    to="/"
+                    to="/app"
                     end
                     className={({ isActive }) =>
                       [baseRow, isActive ? activePill : ""].join(" ")
@@ -146,15 +148,15 @@ export default function Shell() {
                     />
                     {meetingsOpen && (
                       <div id="meetings-submenu" className="mt-1 flex flex-col gap-1">
-                        <ChildLink to="/meetings" label="All meetings" />
-                        <ChildLink to="/meetings/live" label="Add to Live meeting" />
+                        <ChildLink to="/app/meetings" label="All meetings" />
+                        <ChildLink to="/app/meetings/live" label="Add to Live meeting" />
                       </div>
                     )}
                   </div>
 
                   {/* Transcripts */}
                   <NavLink
-                    to="/transcripts"
+                    to="/app/transcripts"
                     end
                     className={({ isActive }) =>
                       [baseRow, isActive ? activePill : ""].join(" ")
@@ -166,7 +168,7 @@ export default function Shell() {
 
                   {/* Schedules */}
                   <NavLink
-                    to="/schedules"
+                    to="/app/schedules"
                     end
                     className={({ isActive }) =>
                       [baseRow, isActive ? activePill : ""].join(" ")
@@ -190,9 +192,9 @@ export default function Shell() {
                     />
                     {settingsOpen && (
                       <div id="settings-submenu" className="mt-1 flex flex-col gap-1">
-                        <ChildLink to="/settings/profile" label="Profile Settings" />
-                        <ChildLink to="/settings/meeting" label="Meetings Settings" />
-                        <ChildLink to="/settings/account" label="Account Settings" />
+                        <ChildLink to="/app/settings/profile" label="Profile Settings" />
+                        <ChildLink to="/app/settings/meeting" label="Meetings Settings" />
+                        <ChildLink to="/app/settings/account" label="Account Settings" />
                       </div>
                     )}
                   </div>

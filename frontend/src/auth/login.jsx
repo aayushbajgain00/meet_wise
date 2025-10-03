@@ -29,7 +29,7 @@ export default function Login() {
 
       const session = { ...user, token };
       localStorage.setItem("userInfo", JSON.stringify(session));
-      navigate("/homepage");
+      navigate("/app");
     },
     onError: (message) => {
       Swal.fire({
@@ -56,7 +56,7 @@ export default function Login() {
 
       // Sending Microsoft token for verification
       const { data } = await axios.post(
-        "http://localhost:5000/api/user/microsoft-login",
+        "http://localhost:8000/api/user/microsoft-login",
         { accessToken: response.accessToken },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -80,7 +80,7 @@ export default function Login() {
           showConfirmButton: false,
         });
 
-        navigate("/homepage");
+        navigate("/app");
       }
     } catch (error) {
       Swal.fire({
@@ -146,7 +146,7 @@ export default function Login() {
           showConfirmButton: false,
         });
 
-        navigate("/homepage");
+        navigate("/app");
       }
     } catch (error) {
       Swal.fire({

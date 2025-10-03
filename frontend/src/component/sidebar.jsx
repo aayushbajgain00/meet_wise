@@ -11,17 +11,19 @@ import {
 import "./sidebar.css";
 import { useState } from "react";
 
+const APP_BASE = "/app";
+
 const mainItems = [
-  { to: "/", label: "Home", icon: <FaHome />, exact: true },
-  { to: "/meetings", label: "Meetings", icon: <FaVideo /> },
-  { to: "/meeting-status", label: "Meeting Status", icon: <FaListUl /> },
-  { to: "/upload", label: "Transcripts", icon: <FaUpload /> }, // was "Upload" in Settings branch
+  { to: `${APP_BASE}`, label: "Home", icon: <FaHome />, exact: true },
+  { to: `${APP_BASE}/meetings`, label: "Meetings", icon: <FaVideo /> },
+  { to: `${APP_BASE}/meeting-status`, label: "Meeting Status", icon: <FaListUl /> },
+  { to: `${APP_BASE}/upload`, label: "Transcripts", icon: <FaUpload /> }, // was "Upload" in Settings branch
 ];
 
 const settingsSubItems = [
-  { to: "/settings/meeting", label: "Meeting Settings" },
-  { to: "/settings/profile", label: "Profile Settings" },
-  { to: "/settings/account", label: "Account Settings" },
+  { to: `${APP_BASE}/settings/meeting`, label: "Meeting Settings" },
+  { to: `${APP_BASE}/settings/profile`, label: "Profile Settings" },
+  { to: `${APP_BASE}/settings/account`, label: "Account Settings" },
 ];
 
 export default function Sidebar() {
@@ -39,7 +41,7 @@ export default function Sidebar() {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <a href="/" aria-label="Home">
+        <a href="/app" aria-label="Home">
           <img src="/meetwise-logo.png" alt="Meetwise" />
         </a>
       </div>
