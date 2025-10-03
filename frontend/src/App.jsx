@@ -6,14 +6,16 @@ import ScheduleZoom from "./pages/ScheduleZoom.jsx";
 // Public (no sidebar)
 import UserLogin from "./auth/login";
 import UserSignup from "./auth/signup";
-
-// Pages
 import HomePage from "./pages/homepage.jsx";
+import AllMeetings from "./pages/Allmeeting.jsx";
+import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
 import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
 import Schedules from "./pages/Schedules.jsx";
-import AllMeetings from "./pages/allMeetings.jsx";
+import ProfileSetting from "./pages/ProfileSetting.jsx";
+import MeetingSetting from "./pages/MeetingSetting.jsx";
+import AccountSetting from "./pages/AccountSetting.jsx";
 import LiveMeeting from "./pages/LiveMeeting.jsx";
 import ApiPing from "./pages/ApiPing.jsx";
 import CreateZoomAndSchedule from "./pages/CreateZoomAndSchedule";
