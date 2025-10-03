@@ -25,9 +25,11 @@ export default function useGoogleAuth({ onSuccess, onError } = {}) {
   }, []);
 
   const startGoogleAuth = useCallback(() => {
+
     const backendBaseUrl = (api.defaults.baseURL || "http://localhost:5000").replace(/\/$/, "");
     // Add the known query param to skip ngrok's browser warning page
     const authUrl = `${backendBaseUrl}/api/user/google?ngrok-skip-browser-warning=1`;
+
     const backendOrigin = new URL(backendBaseUrl).origin;
 
     completedRef.current = false;
@@ -61,7 +63,9 @@ export default function useGoogleAuth({ onSuccess, onError } = {}) {
 
       try {
         popup.close();
-      } catch (_) {}
+      } catch {
+        // Ignore errors if popup is already closed or cannot be closed
+      }
     };
 
     window.addEventListener("message", listenerRef.current);
