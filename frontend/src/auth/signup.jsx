@@ -104,6 +104,7 @@ export default function Signup() {
   return (
     <AuthLayout>
       <form className="space-y-5" onSubmit={submitHandler}>
+        {/* Name */}
         <div>
 <div>
   <label
@@ -174,11 +175,13 @@ export default function Signup() {
   </p>
 </div>
 
+        {/* Submit button */}
         <Button loading={loading} name={"Sign Up"} loadingName={"Signing up"} />
         </div>
       </form>
 
-      <p className="mt-6 mb-4 flex w-full items-center justify-between text-center text-sm text-gray-600">
+      {/* Already a member */}
+      <p className="mt-6 mb-4 text-center text-sm text-gray-600">
         Already a member?{" "}
         <Link to="/login">
           <span className="font-small underline hover:text-blue-500 transition-colors">
@@ -187,6 +190,7 @@ export default function Signup() {
         </Link>
       </p>
 
+      {/* Divider */}
       <div className="flex flex-col gap-4 items-center justify-center text-sm text-gray-500">
         <div className="relative flex items-center w-full max-w-xs">
           <div className="flex-grow border-t border-gray-300"></div>
@@ -194,11 +198,14 @@ export default function Signup() {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
+        {/* Google signup */}
         <button
           type="button"
           onClick={startGoogleAuth}
           disabled={googleLoading}
-          className="flex items-center justify-center border border-blue-300 p-3 hover:bg-gray-100 hover:text-black hover:border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center justify-center border border-blue-300 p-3 
+          hover:bg-gray-100 hover:text-black hover:border-black cursor-pointer 
+          disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {googleLoading ? (
             "Signing up..."
