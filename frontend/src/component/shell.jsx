@@ -38,15 +38,44 @@ export default function Shell() {
   const navigate = useNavigate();
   const location = useLocation();
   const { instance, accounts } = useMsal();
+   // profile state
+  const [profile, setProfile] = useState(null);
 
-  // Name from MSAL → localStorage → fallback
-  const activeAcc = instance.getActiveAccount?.() || accounts?.[0];
-  const profileName =
-    activeAcc?.name ||
-    activeAcc?.idTokenClaims?.name ||
-    localStorage.getItem("mw_user_name") ||
-    "User";
-  const userInitial = (profileName || "U").slice(0, 1).toUpperCase();
+  // Load profile once when Shell mounts
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const session = JSON.parse(localStorage.getItem("userInfo"));
+        const userId = session?._id;
+        if (!userId) return;
+
+        const res = await fetch(`/api/user/profile?id=${userId}`);
+        if (!res.ok) throw new Error("Failed to load profile");
+        const data = await res.json();
+        setProfile(data);
+      } catch (err) {
+        console.error("Profile load error:", err);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  // fallback initials
+  const userInitial = profile?.name
+    ? profile.name.slice(0, 1).toUpperCase()
+    : "U";
+
+  const profileName = profile?.name || "User";
+  const profilePhoto = profile?.photo;
+
+  // // Name from MSAL → localStorage → fallback
+  // const activeAcc = instance.getActiveAccount?.() || accounts?.[0];
+  // const profileName =
+  //   activeAcc?.name ||
+  //   activeAcc?.idTokenClaims?.name ||
+  //   localStorage.getItem("mw_user_name") ||
+  //   "User";
+  // const userInitial = (profileName || "U").slice(0, 1).toUpperCase();
 
   // Dropdown open state – auto-open on route
   const [meetingsOpen, setMeetingsOpen] = useState(false);
@@ -107,18 +136,22 @@ export default function Shell() {
           <div className="sticky top-3 w-[260px] h-full">
             <div className="flex flex-col h-full rounded-3xl border border-[#eee] bg-[#f5f3f3]/60 p-3 shadow-sm">
               {/* Profile */}
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div className="mb-3 flex items-center gap-3">
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt="Profile"
+                    className="h-10 w-10 rounded-full object-cover"
+                  />
+                ) : (
                   <div className="grid h-10 w-10 place-items-center rounded-full bg-[#4F83E0] font-bold text-white">
                     {userInitial}
                   </div>
-                  <div className="max-w-[150px] truncate text-sm font-semibold">
-                    {profileName}
-                  </div>
+                )}
+                <div className="max-w-[150px] truncate text-sm font-semibold">
+                  {profileName}
                 </div>
-                <span aria-hidden className="h-6 w-6" />
-              </div>
-
+</div>
               <div className="mb-2 h-px w-full bg-[#eaeaea]" />
 
               {/* Scrollable nav area */}
@@ -220,7 +253,7 @@ export default function Shell() {
 
         {/* Main routed content */}
         <main className="flex-1 h-full py-6 px-4 overflow-auto">
-          <Outlet />
+          <Outlet context={{ profile, setProfile }} />
         </main>
       </div>
     </div>
