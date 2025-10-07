@@ -23,13 +23,21 @@
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+<<<<<<< Updated upstream
+=======
+    "mongodb": "^6.20.0",
+>>>>>>> Stashed changes
     "mongoose": "^8.18.1",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "node-cron": "^4.2.1",
     "path": "^0.12.7",
+<<<<<<< Updated upstream
     "puppeteer": "^24.22.0",
     "openai": "^4.78.1"
+=======
+    "puppeteer": "^24.23.0"
+>>>>>>> Stashed changes
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
