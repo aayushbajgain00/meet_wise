@@ -12,7 +12,11 @@ import meetingRoutes from "./routes/meetingRoutes.js";
 import schedulerRoutes from "./routes/schedulerRoutes.js";
 import "./service/schedulerService.js";
 import zoomMeetingsRoutes from "./routes/zoomMeetingRoutes.js"
-import zoomUserAuthRoutes from "./routes/zoomUserAuthRoutes.js";
+import zoomUserAuthRoutes from "./routes/zoomUserAuthRoutes.js"
+
+// ✅ NEW: Microsoft Teams routes
+import teamsMeetingsRoutes from "./routes/teamsMeetingsRoutes.js";
+import teamsUserAuthRoutes from "./routes/teamsUserAuthRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -82,6 +86,10 @@ app.use("/api/meetings", meetingRoutes);
 app.use("/scheduler", schedulerRoutes);
 app.use("/zoom/meetings", zoomMeetingsRoutes);
 app.use("/zoom", zoomUserAuthRoutes);
+
+// ✅ Microsoft Teams integrations
+app.use("/teams/meetings", teamsMeetingsRoutes);
+app.use("/teams", teamsUserAuthRoutes);
 
 app.get("/", (req, res) => {
   res.send("Welcome to meetwise");

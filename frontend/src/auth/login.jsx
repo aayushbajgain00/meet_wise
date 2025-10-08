@@ -61,7 +61,7 @@ export default function Login() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (data.success) {
+      if (data.success) {3363
         const name =
           data.user?.name ||
           response.account?.name ||

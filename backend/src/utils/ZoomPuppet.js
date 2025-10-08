@@ -1,4 +1,3 @@
-// src/utils/zoomBot.js
 import puppeteer from "puppeteer";
 import { generateZoomSignature } from "./ZoomSignature.js";
 

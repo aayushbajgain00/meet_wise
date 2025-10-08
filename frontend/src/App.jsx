@@ -12,17 +12,16 @@ import LandingPage from "./pages/LandingPage.jsx";
 import HomePage from "./pages/homepage.jsx";
 import AllMeetings from "./pages/allMeetings.jsx";
 import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
+import LiveMeeting from "./pages/LiveMeeting.jsx";
 import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
 import Schedules from "./pages/Schedules.jsx";
-
-
-
-import LiveMeeting from "./pages/LiveMeeting.jsx";
 import ApiPing from "./pages/ApiPing.jsx";
 import CreateZoomAndSchedule from "./pages/CreateZoomAndSchedule.jsx";
+import CreateTeamsAndSchedule from "./pages/CreateTeamsAndSchedule.jsx";
 
+// Settings subpages
 import ProfileSettings from "./pages/ProfileSetting.jsx";
 import MeetingSettings from "./pages/MeetingSetting.jsx";
 import AccountSettings from "./pages/AccountSetting.jsx";
@@ -35,7 +34,7 @@ export default function App() {
       <Route path="/login" element={<UserLogin />} />
       <Route path="/signup" element={<UserSignup />} />
 
-      {/* Authenticated app routes */}
+      {/* Authenticated app routes inside Shell */}
       <Route path="/app" element={<Shell />}>
         <Route index element={<HomePage />} />
         <Route path="meetings" element={<AllMeetings />} />
@@ -50,9 +49,10 @@ export default function App() {
         <Route path="settings/account" element={<AccountSettings />} />
         <Route path="ping" element={<ApiPing />} />
         <Route path="schedule" element={<CreateZoomAndSchedule />} />
+        <Route path="teams" element={<CreateTeamsAndSchedule />} />
       </Route>
 
-      {/* Fallback */}
+      {/* Fallback for unknown routes */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
