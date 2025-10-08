@@ -10,7 +10,6 @@ import api from "../lib/api";
 
 export default function Signup() {
   const [loading, setLoading] = useState(false);
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -27,7 +26,7 @@ export default function Signup() {
       });
       const session = { ...user, token };
       localStorage.setItem("userInfo", JSON.stringify(session));
-      navigate("/homepage");
+      navigate("/app");
     },
     onError: (message) => {
       Swal.fire({
@@ -46,7 +45,7 @@ export default function Signup() {
     e.preventDefault();
     setLoading(true);
 
-    if (!name || !email || !password) {
+  if (!email || !password) {
       Swal.fire({
         title: "Please fill all the fields",
         icon: "warning",
@@ -166,6 +165,7 @@ export default function Signup() {
         </div>
 
         <Button loading={loading} name={"Sign Up"} loadingName={"Signing up"} />
+        </div>
       </form>
 
       {/* Login Link */}
@@ -186,11 +186,14 @@ export default function Signup() {
           <div className="flex-grow border-t border-gray-300"></div>
         </div>
 
+        {/* Google signup */}
         <button
           type="button"
           onClick={startGoogleAuth}
           disabled={googleLoading}
-          className="flex items-center justify-center border border-blue-300 p-3 hover:bg-gray-100 hover:text-black hover:border-black cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex items-center justify-center border border-blue-300 p-3 
+          hover:bg-gray-100 hover:text-black hover:border-black cursor-pointer 
+          disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {googleLoading ? (
             "Signing up..."

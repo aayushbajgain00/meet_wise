@@ -8,15 +8,17 @@ import Shell from "./component/shell.jsx";
 // Public routes (no shell)
 import UserLogin from "./auth/login";
 import UserSignup from "./auth/signup";
+import LandingPage from "./pages/LandingPage.jsx";
 
 // Core pages
 import HomePage from "./pages/homepage.jsx";
+import AllMeetings from "./pages/allMeetings.jsx";
+import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
+import LiveMeeting from "./pages/LiveMeeting.jsx";
 import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
 import Schedules from "./pages/Schedules.jsx";
-import AllMeetings from "./pages/allMeetings.jsx";
-import LiveMeeting from "./pages/LiveMeeting.jsx";
 import ApiPing from "./pages/ApiPing.jsx";
 
 // Meeting scheduling pages
