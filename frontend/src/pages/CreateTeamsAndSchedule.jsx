@@ -24,6 +24,8 @@ function readUser() {
 async function refreshUserSummary(id) {
   const { data } = await api.get(`/api/user/${id}/summary`);
   const u = readUser();
+  3
+  
   if (u && (u._id === id || u.userId === id)) {
     localStorage.setItem("userInfo", JSON.stringify({ ...u, ...data }));
   }
