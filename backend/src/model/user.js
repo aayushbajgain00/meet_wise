@@ -29,17 +29,9 @@ const MicrosoftAuthSchema = new mongoose.Schema(
 
 const userSchema = new mongoose.Schema(
   {
-<<<<<<< Updated upstream
-    // your existing fields
-    name: { type: String, required: true },
-    email: { type: String, unique: true, required: true, index: true },
-    password: { type: String }, // only for "local" auth users
-
-=======
     name: { type: String },
-    email: { type: String, unique: true, required: true },
-    password: { type: String },
->>>>>>> Stashed changes
+    email: { type: String, unique: true, required: true, index: true },
+    password: { type: String }, // only used for "local" auth users
     authProvider: {
       type: String,
       enum: ["local", "microsoft", "google"],
@@ -49,11 +41,6 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String, index: true },
     picture: { type: String },
     isVerified: { type: Boolean, default: false },
-<<<<<<< Updated upstream
-
-    // NEW: Zoom OAuth credentials saved per app user
-    zoomAuth: ZoomAuthSchema,
-=======
     username: { type: String },
     bio: { type: String },
     photo: { type: String },
@@ -63,7 +50,6 @@ const userSchema = new mongoose.Schema(
     // ✅ OAuth sub-documents
     zoomAuth: ZoomAuthSchema,
     microsoftAuth: MicrosoftAuthSchema,
->>>>>>> Stashed changes
   },
   { timestamps: true }
 );
