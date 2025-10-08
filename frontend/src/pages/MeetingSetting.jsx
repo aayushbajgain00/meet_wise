@@ -1,19 +1,28 @@
+
 import React from "react";
 import "./MeetingSetting.css";
 
 export default function MeetingSetting() {
   return (
-    <div className="meeting-settings-card">
-      <div className="meeting-settings-title">Meeting Settings</div>
-      <div className="meeting-settings-section">
-        <div className="meeting-settings-subtitle">Meeting Language</div>
-        <p>LANGUAGE USED TO TRANSCRIBE YOUR MEETINGS</p>
-        <input type="text" placeholder="English(Global)" style={{ width: "300px" }} />
+    <div className="ms-container">
+      <div className="ms-header-box">
+        <h1 className="ms-header">Meeting Settings</h1>
       </div>
-      <div className="meeting-settings-section">
-        <div className="meeting-settings-subtitle" style={{ marginTop: 0 }}>Autojoin Settings</div>
-        <p>MEETINGS FIREFLIES WILL JOIN</p>
-        <input type="text" placeholder="All meetings with web-conf link" style={{ width: "300px" }} />
+      <div className="ms-section">
+        <h2 className="ms-section-title">Meeting Language</h2>
+        <div className="ms-label">LANGUAGE&nbsp; USED TO TRANSCRIBE YOUR MEETINGS</div>
+        <div className="ms-desc">Select the language spoken during your meetings to get transcripts and summaries in that language.</div>
+        <div className="ms-input-row">
+          <input className="ms-input" type="text" value="English(Global)" readOnly />
+        </div>
+      </div>
+      <div className="ms-section">
+        <h2 className="ms-section-title">Autojoin Settings</h2>
+        <div className="ms-label">MEETINGS MEETWISE WILL JOIN</div>
+        <div className="ms-desc">Auto-join calendar events</div>
+        <div className="ms-input-row">
+          <input className="ms-input" type="text" value="All meetings with web-conf link" readOnly />
+        </div>
       </div>
     </div>
   );

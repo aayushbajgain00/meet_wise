@@ -1,3 +1,58 @@
+/* Match Account Settings page appearance */
+.ps-bg {
+  min-height: 100vh;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+.ps-container {
+  width: 100%;
+  max-width: 42rem;
+}
+.ps-header-box {
+  border: 4px solid #60a5fa;
+  border-radius: 0.75rem;
+  margin-bottom: 2rem;
+  background: #ededf2;
+}
+.ps-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.5rem 0;
+  background: #f3f4f6;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  letter-spacing: 0.03em;
+}
+.ps-card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
+  padding: 2.5rem 2.5rem 2.5rem 2.5rem;
+  margin: 0 auto;
+  max-width: 44rem;
+}
+
+/* Profile Settings Heading Styles */
+.ps-header-box {
+  border: 3px solid #2196f3;
+  border-radius: 0;
+  margin: 1.5rem 0 1rem 0;
+  width: 100%;
+  background: #ededf2;
+  box-sizing: border-box;
+}
+.ps-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.5rem 0;
+  letter-spacing: 0.03em;
+}
 /* ProfileSetting.css - Light profile form aligned with reference */
 
 .profile-settings-container {

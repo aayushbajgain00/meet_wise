@@ -2,6 +2,7 @@ import { useMsal } from '@azure/msal-react';
 import React, { useEffect, useState } from 'react';
 import { FaCalendarAlt, FaCalendarDay, FaCalendarWeek, FaFile, FaFilter } from 'react-icons/fa';
 import MicrosoftGraphService from '../lib/microsoftGraph';
+import api from '../lib/api';
 
 const AllMeetings = () => {
   const [meetings, setMeetings] = useState([]);
@@ -88,6 +89,42 @@ const AllMeetings = () => {
     }
   };
 
+  const loadBackendMeetings = async () => {
+    try {
+      const { data } = await api.get("/api/meetings");
+      const mapped = (data || []).map((meeting, index) => {
+        const createdAt = meeting.createdAt ? new Date(meeting.createdAt) : new Date();
+        const status = meeting.status || "Recorded";
+        return {
+          id: meeting._id || index,
+          name: meeting.topic || "Recorded Meeting",
+          date: createdAt.toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          }).toLowerCase(),
+          duration: meeting.recordings?.[0]?.duration || meeting.recordings?.[0]?.length || "--",
+          location: meeting.recordings?.[0]?.fileType || "Recording",
+          meetingUrl: meeting.recordings?.[0]?.playUrl,
+          time: createdAt.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          }),
+          timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          status,
+          rawEvent: meeting,
+        };
+      });
+
+      setMeetings(mapped);
+    } catch (backendError) {
+      console.error("Fallback backend meetings failed", backendError);
+      setError("Unable to load meetings from Outlook or backend");
+      setMeetings([]);
+    }
+  };
+
   const fetchOutlookMeetings = async () => {
     setLoading(true);
     setError(null);
@@ -119,8 +156,8 @@ const AllMeetings = () => {
     } catch (error) {
       console.error('Error fetching Outlook meetings:', error);
       setError('Failed to fetch meetings from Outlook Calendar');
-      
-      setMeetings([]);
+
+      await loadBackendMeetings();
     } finally {
       setLoading(false);
     }
