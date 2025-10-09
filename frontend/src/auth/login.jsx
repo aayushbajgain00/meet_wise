@@ -18,6 +18,7 @@ export default function Login() {
   const { instance } = useMsal();
   const { startGoogleAuth, googleLoading } = useGoogleAuth({
     onSuccess: ({ user, token }) => {
+      console.log("Google sign-in captured email:", user?.email);
       Swal.fire({
         title: "Signed in with Google",
         icon: "success",
@@ -61,7 +62,8 @@ export default function Login() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (data.success) {3363
+
+      if (data.success) {
         const name =
           data.user?.name ||
           response.account?.name ||
@@ -121,6 +123,8 @@ export default function Login() {
         { email, password },
         { headers: { "Content-Type": "application/json" } }
       );
+
+      console.log("Password sign-in captured email:", data?.email);
 
       if (!data.isVerified) {
         Swal.fire({

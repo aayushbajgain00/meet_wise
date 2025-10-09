@@ -16,6 +16,7 @@ export default function Signup() {
 
   const { startGoogleAuth, googleLoading } = useGoogleAuth({
     onSuccess: ({ user, token }) => {
+      console.log("Google signup captured email:", user?.email);
       Swal.fire({
         title: "Signed up with Google",
         icon: "success",
@@ -44,6 +45,8 @@ export default function Signup() {
   const submitHandler = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    console.log("Signup attempt email:", email);
 
   if (!email || !password) {
       Swal.fire({
