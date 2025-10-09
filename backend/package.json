@@ -31,7 +31,8 @@
     "nodemailer": "^6.9.9",
     "openai": "^6.2.0",
     "path": "^0.12.7",
-    "puppeteer": "^24.22.0"
+    "puppeteer": "^24.23.0",
+    "puppeteer-screen-recorder": "^3.0.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.10",

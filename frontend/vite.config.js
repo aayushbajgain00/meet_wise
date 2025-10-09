@@ -13,6 +13,9 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:5000", // backend server
         changeOrigin: true,
+      }, "/recordings": {
+        target: "http://localhost:5000",
+        changeOrigin: true,
       },
     },
   }

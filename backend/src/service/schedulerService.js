@@ -32,7 +32,7 @@
 
 import cron from "node-cron";
 import ScheduledMeeting from "../model/schedule.js";
-import { joinZoomMeeting } from "../utils/ZoomPuppet.js";
+// import { joinZoomMeeting } from "../utils/ZoomPuppet.js";
 import { joinTeamsMeeting } from "../utils/teamsBot.js";
 
 cron.schedule("* * * * *", async () => {

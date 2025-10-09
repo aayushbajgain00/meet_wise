@@ -5,6 +5,8 @@ import {
   FaCog, FaSignOutAlt, FaChevronDown, FaChevronUp
 } from "react-icons/fa";
 import { useMsal } from "@azure/msal-react";
+import { FaRecordVinyl } from "react-icons/fa";
+
 
 /* ---------------- Topbar ---------------- */
 function Topbar() {
@@ -198,10 +200,22 @@ export default function Shell() {
                     <span className="text-[18px] text-[#232B3B]"><FaRegFileAlt /></span>
                     <span>Transcripts</span>
                   </NavLink>
+                  {/* Recordings */}
+<NavLink
+  to="/app/recordings"
+  end
+  className={({ isActive }) =>
+    [baseRow, isActive ? activePill : ""].join(" ")
+  }
+>
+  <span className="text-[18px] text-[#232B3B]"><FaRecordVinyl /></span>
+  <span>Recordings</span>
+</NavLink>
+
 
                   {/* Schedules */}
                   <NavLink
-                    to="/app/schedules"
+                    to="/app/teams"
                     end
                     className={({ isActive }) =>
                       [baseRow, isActive ? activePill : ""].join(" ")
