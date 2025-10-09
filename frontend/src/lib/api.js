@@ -4,7 +4,7 @@ import { createRef } from "react";
 export const toastRef = createRef(); 
 
 const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_BASE || "http://localhost:8000").replace(/\/$/, ""),
+  baseURL: (import.meta.env.VITE_API_BASE || "http://localhost:5000").replace(/\/$/, ""),
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });

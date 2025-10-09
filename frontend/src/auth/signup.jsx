@@ -132,6 +132,7 @@ export default function Signup() {
     />
   </div>
 </div>
+</div>
 
 <div>
   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
