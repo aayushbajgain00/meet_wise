@@ -33,16 +33,15 @@ import AccountSettings from "./pages/AccountSettings.jsx";
 import Recordings from "./pages/Recordings";
 
 
-
-
 export default function App() {
   return (
     <Routes>
-      {/* 🔓 Public routes (no shell) */}
+      {/*  Public routes (no shell) */}
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<UserLogin />} />
       <Route path="/signup" element={<UserSignup />} />
 
-      {/* 🔒 Authenticated app routes inside the Shell */}
+      {/*  Authenticated app routes inside the Shell */}
       <Route path="/app" element={<Shell />}>
         {/* Default index route */}
         <Route index element={<HomePage />} />
@@ -67,18 +66,12 @@ export default function App() {
         <Route path="ping" element={<ApiPing />} />
         <Route path="schedule" element={<CreateZoomAndSchedule />} />
         <Route path="teams" element={<CreateTeamsAndSchedule />} />
+        <Route path="/app/recordings" element={<Recordings />} />
+
       </Route>
 
-      {/* 🧭 Redirect root and homepage to /app */}
-      <Route path="/" element={<Navigate to="/app" replace />} />
-      <Route path="/homepage" element={<Navigate to="/app" replace />} />
-
-
-     <Route path="/app/recordings" element={<Recordings />} />
-
-
       {/* 🚫 Fallback for unknown routes */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
