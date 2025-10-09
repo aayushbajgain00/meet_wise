@@ -62,8 +62,8 @@ export default function Login() {
         { headers: { "Content-Type": "application/json" } }
       );
 
+
       if (data.success) {
-        console.log("Microsoft sign-in captured email:", data.user?.email);
         const name =
           data.user?.name ||
           response.account?.name ||
