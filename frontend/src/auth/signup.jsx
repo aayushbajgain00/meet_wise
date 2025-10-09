@@ -11,6 +11,7 @@ import api from "../lib/api";
 export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
@@ -48,7 +49,7 @@ export default function Signup() {
 
     console.log("Signup attempt email:", email);
 
-  if (!email || !password) {
+  if (!name || !email || !password) {
       Swal.fire({
         title: "Please fill all the fields",
         icon: "warning",
@@ -168,7 +169,6 @@ export default function Signup() {
         </div>
 
         <Button loading={loading} name={"Sign Up"} loadingName={"Signing up"} />
-        </div>
       </form>
 
       {/* Login Link */}

@@ -53,7 +53,7 @@ export default function Login() {
         prompt: "select_account",
       };
 
-      const response = await instance.loginPopup(loginRequest);
+      const response = await instance.loginRedirect(loginRequest);
 
       // Sending Microsoft token for verification
       const { data } = await axios.post(
