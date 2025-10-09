@@ -30,6 +30,11 @@ import ProfileSettings from "./pages/ProfileSetting.jsx";
 import MeetingSettings from "./pages/MeetingSetting.jsx";
 import AccountSettings from "./pages/AccountSettings.jsx";
 
+import Recordings from "./pages/Recordings";
+
+
+
+
 export default function App() {
   return (
     <Routes>
@@ -67,6 +72,10 @@ export default function App() {
       {/* 🧭 Redirect root and homepage to /app */}
       <Route path="/" element={<Navigate to="/app" replace />} />
       <Route path="/homepage" element={<Navigate to="/app" replace />} />
+
+
+     <Route path="/app/recordings" element={<Recordings />} />
+
 
       {/* 🚫 Fallback for unknown routes */}
       <Route path="*" element={<Navigate to="/login" replace />} />
