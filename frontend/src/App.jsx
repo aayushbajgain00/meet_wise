@@ -47,9 +47,9 @@ export default function App() {
         <Route path="schedules" element={<Schedules />} />
         <Route path="upload" element={<Upload />} />
         <Route path="settings" element={<Settings />} />
-        <Route path="settings/profile" element={<ProfileSettings />} />
-        <Route path="settings/meeting" element={<MeetingSettings />} />
-        <Route path="settings/account" element={<AccountSettings />} />
+  <Route path="settings/profile" element={<ProfileSetting />} />
+  <Route path="settings/meeting" element={<MeetingSetting />} />
+  <Route path="settings/account" element={<AccountSetting />} />
         <Route path="ping" element={<ApiPing />} />
         <Route path="schedule" element={<CreateZoomAndSchedule />} />
       </Route>
