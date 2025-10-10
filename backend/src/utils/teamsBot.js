@@ -4,11 +4,11 @@ import path from "path";
 import { PuppeteerScreenRecorder } from "puppeteer-screen-recorder";
 
 export async function joinTeamsMeeting(meetingUrl) {
-  console.log(`🤖 Bot preparing to join Teams meeting: ${meetingUrl}`);
+  console.log(`🤖 Joining Teams meeting: ${meetingUrl}`);
 
   const recordingsDir = path.join(process.cwd(), "public/recordings");
   fs.mkdirSync(recordingsDir, { recursive: true });
-  const output = path.join(recordingsDir, `teams_meeting_${Date.now()}.mp4`);
+  const filePath = path.join(recordingsDir, `teams_meeting_${Date.now()}.mp4`);
 
   const browser = await puppeteer.launch({
     headless: false,
@@ -18,219 +18,145 @@ export async function joinTeamsMeeting(meetingUrl) {
       "--disable-setuid-sandbox",
       "--use-fake-ui-for-media-stream",
       "--use-fake-device-for-media-stream",
-      "--enable-gpu",
+      "--disable-dev-shm-usage",
       "--window-size=1366,768",
       "--autoplay-policy=no-user-gesture-required",
       "--mute-audio",
+      "--disable-infobars",
+      "--allow-file-access-from-files",
+      "--use-fake-ui-for-media-stream",
     ],
   });
 
   const page = await browser.newPage();
-  await page.setViewport({ width: 1366, height: 768 });
-  console.log("🌐 Opening meeting page...");
-  await page.goto(meetingUrl, { waitUntil: "networkidle2", timeout: 60000 });
+  await page.goto(meetingUrl, { waitUntil: "domcontentloaded" });
 
-  // 1️⃣ Click “Join on Web Instead”
+  // 💡 Handle "Join on Web"
   try {
-    const joinOnWeb = await Promise.race([
-      page.waitForSelector("a[data-tid='joinOnWeb']", { timeout: 15000 }),
-      page.waitForSelector("button[data-tid='joinOnWeb']", { timeout: 15000 }),
-    ]);
-    if (joinOnWeb) {
-      await joinOnWeb.click();
-      console.log("✅ Clicked 'Join on Web Instead'");
+    await page.waitForSelector('a[data-tid="joinOnWeb"]', { timeout: 20000 });
+    await page.click('a[data-tid="joinOnWeb"]');
+    console.log("✅ Clicked 'Join on Web'");
+  } catch {
+    console.log("⚠️ 'Join on Web' not found — likely already on pre-join");
+  }
+
+  // 💡 Allow permissions if popup appears
+  try {
+    const permButton = await page.$("button:has-text('Allow')");
+    if (permButton) {
+      await permButton.click();
+      console.log("🔓 Allowed camera/mic permissions");
     }
-  } catch {
-    console.log("⚠️ Could not find 'Join on Web Instead'");
-  }
+  } catch {}
 
-  // 2️⃣ Enter guest name
+  // 💡 Enter Bot Name
   try {
-    await page.waitForSelector('input[data-tid="guest-name-input"], input[type="text"]', { timeout: 20000 });
-    await page.click('input[data-tid="guest-name-input"], input[type="text"]', { clickCount: 3 });
-    await page.type('input[data-tid="guest-name-input"], input[type="text"]', "MeetWise Bot 🤖", { delay: 40 });
-    console.log("✏️ Entered guest name");
+    await page.waitForSelector('input[type="text"]', { timeout: 15000 });
+    await page.type('input[type="text"]', "MeetWise Bot");
   } catch {
-    console.log("⚠️ Could not find name field");
+    console.log("⚠️ Could not type name");
   }
 
-  // 3️⃣ Disable mic & camera
-  for (const t of ['[data-tid="toggle-camera"]', '[data-tid="toggle-microphone"]']) {
-    try {
-      if (await page.$(t)) await page.click(t);
-    } catch {}
-  }
-  console.log("🎙️ Disabled mic and camera");
-
-  // 4️⃣ Click “Join now”
+  // 💡 Disable mic and camera
   try {
-    const joinBtn =
-      (await page.$('button[data-tid="prejoin-join-button"]')) ||
-      (await page.$('button[aria-label*="Join now"]'));
-    if (joinBtn) {
-      await joinBtn.click();
-      console.log("🚀 Clicked 'Join now'");
-    } else {
-      await page.keyboard.press("Enter");
+    const selectors = [
+      '[data-tid="toggle-microphone"]',
+      '[data-tid="toggle-camera"]',
+    ];
+    for (const sel of selectors) {
+      const btn = await page.$(sel);
+      if (btn) await btn.click();
     }
-  } catch {
-    console.log("⚠️ Join button not found");
+    console.log("🎙️ Disabled mic & camera");
+  } catch (e) {
+    console.log("⚠️ Mic/cam toggle failed:", e.message);
   }
 
-  // 5️⃣ Wait for meeting to load
+  // 💡 Click Join button
   try {
-    await page.waitForSelector('[data-tid="meeting-call-controls"]', { timeout: 40000 });
-    console.log("✅ Inside meeting UI");
+    const joinBtn = await page.waitForSelector(
+      'button[data-tid="prejoin-join-button"]',
+      { timeout: 25000 }
+    );
+    await joinBtn.click();
+    console.log("🚀 Joining meeting...");
   } catch {
-    console.log("⚠️ Meeting UI not detected, continuing anyway");
+    console.log("⚠️ Join button not found — maybe auto-joined");
   }
 
-  // 6️⃣ Start recording
+  // 💡 Handle Lobby (“Someone will let you in”)
+  try {
+    await page.waitForFunction(
+      () => document.body.innerText.includes("Someone in the meeting should let you in"),
+      { timeout: 10000 }
+    );
+    console.log("🕓 In lobby — waiting to be admitted...");
+  } catch {
+    console.log("✅ Skipped lobby or already inside meeting");
+  }
+
+  // 💡 Wait for actual meeting video UI
+  try {
+    await page.waitForSelector('[data-tid="meeting-call-controls"], canvas, video', {
+      timeout: 60000,
+    });
+    console.log("✅ Meeting UI detected — starting recording");
+  } catch {
+    console.log("⚠️ Meeting video UI not detected, continuing anyway");
+  }
+
+  // 🎥 Start recording
   const recorder = new PuppeteerScreenRecorder(page, {
     followNewTab: true,
-    fps: 25,
+    fps: 24,
     videoFrame: { width: 1366, height: 768 },
     aspectRatio: "16:9",
   });
 
-  await recorder.start(output);
-  console.log(`🎥 Recording started → ${output}`);
+  await recorder.start(filePath);
+  console.log(`🎬 Recording started → ${filePath}`);
 
-  // 7️⃣ Keep recording for up to 30 minutes
-  const RECORD_TIME_MS = 30 * 60 * 1000; // 30 minutes
-  console.log(`🕒 Recording will run for up to ${RECORD_TIME_MS / 60000} minutes...`);
+  // 🧠 Monitor until meeting ends
+  let meetingEnded = false;
+  let joined = false;
 
-  const start = Date.now();
-  while (Date.now() - start < RECORD_TIME_MS) {
+  const interval = setInterval(async () => {
     try {
-      await page.waitForSelector('[data-tid="meeting-call-controls"]', { timeout: 10000 });
-    } catch {
-      console.log("🚪 Meeting ended early — stopping recording...");
-      break;
+      const result = await page.evaluate(() => {
+        const txt = document.body.innerText.toLowerCase();
+        const hasControls = !!document.querySelector(
+          '[data-tid="meeting-call-controls"]'
+        );
+        return {
+          joined: hasControls,
+          ended:
+            txt.includes("call ended") ||
+            txt.includes("left the meeting") ||
+            txt.includes("something went wrong"),
+        };
+      });
+
+      if (result.joined) joined = true;
+      if (joined && result.ended && !meetingEnded) {
+        meetingEnded = true;
+        clearInterval(interval);
+        console.log("🛑 Meeting ended — stopping recording");
+        await recorder.stop();
+        await browser.close();
+        console.log(`💾 Saved recording → ${filePath}`);
+      }
+    } catch (err) {
+      console.log("⚠️ check error:", err.message);
     }
-  }
+  }, 8000);
 
-  // 8️⃣ Stop and finalize
-  console.log("🛑 Stopping recording...");
-  await recorder.stop();
-  console.log("💾 Recording finalized successfully.");
-
-  await page.waitForTimeout(5000); // ensure buffer flush
-  await browser.close();
-  console.log(`✅ Saved playable MP4 → ${output}`);
+  browser.on("disconnected", async () => {
+    if (!meetingEnded) {
+      console.log("🔻 Browser closed manually — finalizing...");
+      try {
+        await recorder.stop();
+        console.log(`💾 Saved before exit → ${filePath}`);
+      } catch {}
+    }
+  });
 }
-
-
-
-// import puppeteer from "puppeteer";
-// import fs from "fs";
-// import path from "path";
-// import { PuppeteerScreenRecorder } from "puppeteer-screen-recorder";
-
-// export async function joinTeamsMeeting(meetingUrl) {
-//   console.log(`🤖 Bot preparing to join Teams meeting: ${meetingUrl}`);
-
-//   const recordingsDir = path.join(process.cwd(), "public/recordings");
-//   fs.mkdirSync(recordingsDir, { recursive: true });
-//   const output = path.join(recordingsDir, `teams_meeting_${Date.now()}.mp4`);
-
-//   // ✅ Full-render browser launch (GPU + window)
-//   const browser = await puppeteer.launch({
-//     headless: false,
-//     defaultViewport: null,
-//     args: [
-//       "--no-sandbox",
-//       "--disable-setuid-sandbox",
-//       "--use-fake-ui-for-media-stream",
-//       "--use-fake-device-for-media-stream",
-//       "--enable-gpu",
-//       "--enable-accelerated-2d-canvas",
-//       "--window-size=1366,768",
-//       "--autoplay-policy=no-user-gesture-required",
-//       "--allow-insecure-localhost",
-//       "--disable-infobars",
-//       "--disable-dev-shm-usage",
-//       "--mute-audio",
-//       "--disable-extensions",
-//     ],
-//   });
-
-//   const page = await browser.newPage();
-//   await page.setViewport({ width: 1366, height: 768 });
-//   console.log("🌐 Opening meeting page...");
-//   await page.goto(meetingUrl, { waitUntil: "networkidle2" });
-
-//   // 1️⃣ Click "Join on Web Instead"
-//   try {
-//     await page.waitForSelector('a[data-tid="joinOnWeb"]', { timeout: 15000 });
-//     await page.click('a[data-tid="joinOnWeb"]');
-//     console.log("✅ Clicked 'Join on Web Instead'");
-//   } catch {
-//     console.log("⚠️ 'Join on Web Instead' not found — continuing...");
-//   }
-
-//   // 2️⃣ Enter bot name
-//   try {
-//     await page.waitForSelector('input[type=\"text\"]', { timeout: 15000 });
-//     await page.click('input[type=\"text\"]', { clickCount: 3 });
-//     await page.type('input[type=\"text\"]', "MeetWise Bot", { delay: 50 });
-//     console.log("✏️ Entered bot name: MeetWise Bot");
-//   } catch {
-//     console.log("⚠️ Could not set bot name");
-//   }
-
-//   // 3️⃣ Disable mic & camera
-//   try {
-//     const toggles = ['[data-tid=\"toggle-camera\"]', '[data-tid=\"toggle-microphone\"]'];
-//     for (const t of toggles) if (await page.$(t)) await page.click(t);
-//     console.log("🎙️ Disabled mic and camera");
-//   } catch {
-//     console.log("⚠️ Could not disable mic/camera");
-//   }
-
-//   // 4️⃣ Click "Join now"
-//   try {
-//     const joinButton =
-//       (await page.$('button[data-tid=\"prejoin-join-button\"]')) ||
-//       (await page.$('button:has-text(\"Join now\")'));
-//     if (joinButton) {
-//       await joinButton.click();
-//       console.log("🚀 Clicked 'Join now'");
-//     } else {
-//       await page.keyboard.press("Enter");
-//     }
-//   } catch {
-//     console.log("⚠️ Join button not found");
-//   }
-
-//   // 5️⃣ Wait for meeting UI to appear
-//   try {
-//     await page.waitForSelector('[data-tid=\"meeting-call-controls\"]', { timeout: 30000 });
-//     console.log("✅ Meeting UI detected — starting recording");
-//   } catch {
-//     console.log("⚠️ Meeting UI not detected, starting recording anyway");
-//   }
-
-//   // 6️⃣ Start recording
-//   const recorder = new PuppeteerScreenRecorder(page, {
-//     followNewTab: true,
-//     fps: 24,
-//     videoFrame: { width: 1366, height: 768 },
-//     aspectRatio: "16:9",
-//   });
-//   await recorder.start(output);
-//   console.log(`🎥 Recording started → ${output}`);
-
-//   // 7️⃣ Keep recording until stopped
-//   console.log("⏳ Bot running. Press CTRL + C to stop and save recording.");
-//   await new Promise(() => {});
-
-//   // 8️⃣ Stop recording gracefully
-//   process.on("SIGINT", async () => {
-//     console.log("\n🛑 Stopping recording...");
-//     await recorder.stop();
-//     await browser.close();
-//     console.log(`💾 Saved recording: ${output}`);
-//     process.exit();
-//   });
-// }

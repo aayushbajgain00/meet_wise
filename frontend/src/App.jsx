@@ -13,7 +13,7 @@ import LandingPage from "./pages/LandingPage.jsx";
 // Core pages
 import HomePage from "./pages/homepage.jsx";
 import AllMeetings from "./pages/allMeetings.jsx";
-import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
+// import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
 import LiveMeeting from "./pages/LiveMeeting.jsx";
 import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
@@ -26,9 +26,9 @@ import CreateZoomAndSchedule from "./pages/CreateZoomAndSchedule.jsx";
 import CreateTeamsAndSchedule from "./pages/CreateTeamsAndSchedule.jsx";
 
 // Settings subpages
-import ProfileSettings from "./pages/ProfileSetting.jsx";
-import MeetingSettings from "./pages/MeetingSetting.jsx";
-import AccountSettings from "./pages/AccountSettings.jsx";
+import ProfileSetting from "./pages/ProfileSetting.jsx";
+import MeetingSetting from "./pages/MeetingSetting.jsx";
+import AccountSetting from "./pages/AccountSettings.jsx";
 
 import Recordings from "./pages/Recordings";
 

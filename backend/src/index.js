@@ -20,7 +20,7 @@ import teamsMeetingsRoutes from "./routes/teamsMeetingsRoutes.js";
 import teamsUserAuthRoutes from "./routes/teamsUserAuthRoutes.js";
 
 
-
+// import teamsBotRoutes from "./routes/teambotRoutes.js";
 import recordingsRouter from "./routes/recordings.js";
 
 
@@ -103,6 +103,11 @@ app.get("/api/recordings", (req, res) => {
 });
 
 app.use("/api/recordings", recordingsRouter);
+// Serve video streaming route
+app.use("/recordings", recordingsRouter);
+
+
+// app.use("/api/teamsbot", teamsBotRoutes);
 
 
 // Routes
