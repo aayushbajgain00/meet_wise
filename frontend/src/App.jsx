@@ -58,11 +58,9 @@ export default function App() {
         <Route path="upload" element={<Upload />} />
         {/* Settings routes */}
         <Route path="settings" element={<Settings />} />
-        <Route path="settings/profile" element={<ProfileSettings />} />
-        <Route path="settings/meeting" element={<MeetingSettings />} />
-        <Route path="settings/account" element={<AccountSettings />} />
-
-        {/* Tools & integrations */}
+        <Route path="settings/profile" element={<ProfileSetting />} />
+        <Route path="settings/meeting" element={<MeetingSetting />} />
+        <Route path="settings/account" element={<AccountSetting />} />
         <Route path="ping" element={<ApiPing />} />
         <Route path="schedule" element={<CreateZoomAndSchedule />} />
         <Route path="teams" element={<CreateTeamsAndSchedule />} />
