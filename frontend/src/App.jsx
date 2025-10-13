@@ -19,14 +19,12 @@ import Schedules from "./pages/Schedules.jsx";
 
 
 import ProfileSetting from "./pages/ProfileSetting.jsx";
-import MeetingSetting from "./pages/MeetingSetting.jsx";
 import AccountSetting from "./pages/AccountSetting.jsx";
 import LiveMeeting from "./pages/LiveMeeting.jsx";
 import ApiPing from "./pages/ApiPing.jsx";
 import CreateZoomAndSchedule from "./pages/CreateZoomAndSchedule.jsx";
 
 const ProfileSettings = () => <div className="text-xl font-semibold">Profile Settings</div>;
-const MeetingSettings = () => <div className="text-xl font-semibold">Meetings Settings</div>;
 const AccountSettings = () => <div className="text-xl font-semibold">Account Settings</div>;
 
 export default function App() {
@@ -47,9 +45,8 @@ export default function App() {
         <Route path="schedules" element={<Schedules />} />
         <Route path="upload" element={<Upload />} />
         <Route path="settings" element={<Settings />} />
-  <Route path="settings/profile" element={<ProfileSetting />} />
-  <Route path="settings/meeting" element={<MeetingSetting />} />
-  <Route path="settings/account" element={<AccountSetting />} />
+        <Route path="settings/profile" element={<ProfileSetting />} />
+        <Route path="settings/account" element={<AccountSetting />} />
         <Route path="ping" element={<ApiPing />} />
         <Route path="schedule" element={<CreateZoomAndSchedule />} />
       </Route>

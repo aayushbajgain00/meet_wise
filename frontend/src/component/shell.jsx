@@ -193,7 +193,6 @@ export default function Shell() {
                     {settingsOpen && (
                       <div id="settings-submenu" className="mt-1 flex flex-col gap-1">
                         <ChildLink to="/app/settings/profile" label="Profile Settings" />
-                        <ChildLink to="/app/settings/meeting" label="Meetings Settings" />
                         <ChildLink to="/app/settings/account" label="Account Settings" />
                       </div>
                     )}
