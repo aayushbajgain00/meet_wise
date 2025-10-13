@@ -3,26 +3,16 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import path from "path";
-import fs from "fs";
-// import { fileURLToPath } from "url";
+import { fileURLToPath } from "url";
 
 import BotRoutes from "./routes/botRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
-// import webhookRoutes from "./routes/webhook.js";
+import webhookRoutes from "./routes/webhook.js";
 import meetingRoutes from "./routes/meetingRoutes.js";
 import schedulerRoutes from "./routes/schedulerRoutes.js";
 import "./service/schedulerService.js";
-// import zoomMeetingsRoutes from "./routes/zoomMeetingRoutes.js"
-// import zoomUserAuthRoutes from "./routes/zoomUserAuthRoutes.js"
-
-// ✅ NEW: Microsoft Teams routes
-import teamsMeetingsRoutes from "./routes/teamsMeetingsRoutes.js";
-import teamsUserAuthRoutes from "./routes/teamsUserAuthRoutes.js";
-
-
-
-import recordingsRouter from "./routes/recordings.js";
-
+import zoomMeetingsRoutes from "./routes/zoomMeetingRoutes.js"
+import zoomUserAuthRoutes from "./routes/zoomUserAuthRoutes.js";
 
 dotenv.config();
 const app = express();
@@ -77,46 +67,21 @@ app.use(express.json());
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 // Serve local recordings (dev only)
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-// app.use(
-//   "/recordings",
-//   express.static(path.join(__dirname, process.env.RECORDINGS_DIR || "public/recordings"))
-// );
-
-// ✅ API route to list all recordings
-app.get("/api/recordings", (req, res) => {
-  const dir = path.join(process.cwd(), "public/recordings");
-  if (!fs.existsSync(dir)) return res.json([]);
-
-  const files = fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".mp4"))
-    .map((f) => ({
-      name: f,
-      url: `http://localhost:${PORT}/recordings/${f}`,
-      createdAt: fs.statSync(path.join(dir, f)).mtime,
-      size: (fs.statSync(path.join(dir, f)).size / (1024 * 1024)).toFixed(2) + " MB",
-    }));
-
-  res.json(files);
-});
-
-app.use("/api/recordings", recordingsRouter);
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use(
+  "/recordings",
+  express.static(path.join(__dirname, process.env.RECORDINGS_DIR || "recordings"))
+);
 
 // Routes
-// app.use("/webhooks", webhookRoutes);
+app.use("/webhooks", webhookRoutes);
 app.use("/bots", BotRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/meetings", meetingRoutes);
 app.use("/scheduler", schedulerRoutes);
-// app.use("/zoom/meetings", zoomMeetingsRoutes);
-// app.use("/zoom", zoomUserAuthRoutes);
-
-// ✅ Microsoft Teams integrations
-app.use("/teams/meetings", teamsMeetingsRoutes);
-app.use("/teams", teamsUserAuthRoutes);
+app.use("/zoom/meetings", zoomMeetingsRoutes);
+app.use("/zoom", zoomUserAuthRoutes);
 
 app.get("/", (req, res) => {
   res.send("Welcome to meetwise");

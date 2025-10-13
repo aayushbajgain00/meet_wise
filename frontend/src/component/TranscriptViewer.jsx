@@ -1,79 +1,64 @@
 import React, { useMemo, useState } from "react";
 
-const toMilliseconds = (value) => {
-  if (typeof value === "number" && !Number.isNaN(value)) return value;
-  return 0;
-};
-
-const formatTimestamp = (ms = 0) => {
-  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  const parts = [minutes.toString().padStart(2, "0"), seconds.toString().padStart(2, "0")];
-  if (hours) {
-    parts.unshift(hours.toString());
-  }
-  return parts.join(":");
-};
-
-const normalizeSegments = (segments = []) =>
-  segments.map((segment, index) => {
-    const startMs = toMilliseconds(segment.startMs ?? segment.start ?? 0);
-    const endMs = toMilliseconds(segment.endMs ?? segment.end ?? 0);
-    return {
-      ...segment,
-      startMs,
-      endMs,
-      key: segment.id || `${startMs}-${endMs}-${index}`,
-    };
+const groupSegmentsBySpeaker = (segments = []) => {
+  if (!Array.isArray(segments) || segments.length === 0) return [];
+  const grouped = [];
+  segments.forEach((segment) => {
+    const speaker = segment.speaker || "Speaker";
+    if (!grouped[speaker]) grouped[speaker] = [];
+    grouped[speaker].push(segment);
   });
+  return Object.entries(grouped).map(([speaker, segs]) => ({ speaker, segments: segs }));
+};
 
 export default function TranscriptViewer({ text, segments, metadata }) {
-  const [view, setView] = useState(Array.isArray(segments) && segments.length ? "segments" : "full");
+  const [view, setView] = useState(segments?.length ? "segments" : "full");
 
-  const normalizedSegments = useMemo(() => normalizeSegments(segments), [segments]);
+  const groupedSegments = useMemo(() => groupSegmentsBySpeaker(segments), [segments]);
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-slate-500">
-          {metadata?.name && <span className="font-semibold text-slate-700">{metadata.name}</span>}
-          {metadata?.mimeType && ` • ${metadata.mimeType}`}
+          {metadata?.name && <span className="font-semibold text-slate-700">{metadata.name}</span>} {metadata?.mimeType && `• ${metadata.mimeType}`}
         </div>
-        {normalizedSegments.length > 0 && (
+        {segments?.length ? (
           <div className="flex items-center gap-2 text-sm">
             <button
               type="button"
               onClick={() => setView("segments")}
-              className={`rounded-full border px-3 py-1 ${
-                view === "segments" ? "border-blue-500 text-blue-600" : "border-slate-300 text-slate-600"
-              }`}
+              className={`rounded-full border px-3 py-1 ${view === "segments" ? "border-blue-500 text-blue-600" : "border-slate-300 text-slate-600"}`}
             >
-              Segments
+              Segmented
             </button>
             <button
               type="button"
               onClick={() => setView("full")}
-              className={`rounded-full border px-3 py-1 ${
-                view === "full" ? "border-blue-500 text-blue-600" : "border-slate-300 text-slate-600"
-              }`}
+              className={`rounded-full border px-3 py-1 ${view === "full" ? "border-blue-500 text-blue-600" : "border-slate-300 text-slate-600"}`}
             >
               Full Text
             </button>
           </div>
-        )}
+        ) : null}
       </div>
 
-      {view === "segments" && normalizedSegments.length ? (
-        <div className="space-y-3">
-          {normalizedSegments.map((segment) => (
-            <div key={segment.key} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                {formatTimestamp(segment.startMs)} → {formatTimestamp(segment.endMs)}
-              </p>
-              <p className="mt-1 text-sm text-slate-700">{segment.text}</p>
+      {view === "segments" && segments?.length ? (
+        <div className="space-y-4">
+          {groupedSegments.map(({ speaker, segments: speakerSegments }) => (
+            <div key={speaker} className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+              <p className="text-sm font-semibold text-slate-700">{speaker}</p>
+              <div className="mt-2 space-y-2 text-sm text-slate-600">
+                {speakerSegments.map((segment) => (
+                  <div key={`${segment.start}-${segment.end}`}>
+                    <p>{segment.text}</p>
+                    {segment.start != null && segment.end != null && (
+                      <p className="text-xs text-slate-400">
+                        {segment.start.toFixed?.(2) || segment.start}s - {segment.end.toFixed?.(2) || segment.end}s
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>

@@ -15,7 +15,6 @@
     "@azure/msal-react": "^3.0.19",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "axios": "^1.12.2",
-    "colors": "^1.4.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
