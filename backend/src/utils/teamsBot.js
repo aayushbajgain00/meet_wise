@@ -1,7 +1,11 @@
 import puppeteer from "puppeteer";
 import fs from "fs";
 import path from "path";
-import { PuppeteerScreenRecorder } from "puppeteer-screen-recorder";
+// import { PuppeteerScreenRecorder } from "puppeteer-screen-recorder";
+import pkg from "puppeteer-video-recorder";
+const { PuppeteerScreenRecorder } = pkg;
+
+
 
 export async function joinTeamsMeeting(meetingUrl) {
   console.log(`🤖 Joining Teams meeting: ${meetingUrl}`);
