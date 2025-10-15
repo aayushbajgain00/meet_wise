@@ -36,7 +36,11 @@ const InsightSchema = new mongoose.Schema(
 
 const MeetingSchema = new mongoose.Schema(
   {
-    platform: { type: String, enum: ["zoom", "meet", "teams"], default: "zoom" },
+    platform: {
+      type: String,
+      enum: ["zoom", "meet", "teams", "upload"],
+      default: "zoom",
+    },
     externalMeetingId: String, // Zoom meeting UUID (unique per occurrence)
     topic: String,
     hostEmail: String,
