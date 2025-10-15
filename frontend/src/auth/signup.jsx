@@ -12,11 +12,13 @@ import api from "../lib/api";
 export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const { startGoogleAuth, googleLoading } = useGoogleAuth({
     onSuccess: ({ user, token }) => {
+      console.log("Google signup captured email:", user?.email);
       Swal.fire({
         title: "Signed up with Google",
         icon: "success",
@@ -46,7 +48,9 @@ export default function Signup() {
     e.preventDefault();
     setLoading(true);
 
-  if (!email || !password) {
+    console.log("Signup attempt email:", email);
+
+  if (!name || !email || !password) {
       Swal.fire({
         title: "Please fill all the fields",
         icon: "warning",
@@ -128,6 +132,7 @@ export default function Signup() {
     />
   </div>
 </div>
+</div>
 
 <div>
   <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -176,7 +181,6 @@ export default function Signup() {
 
         {/* Submit button */}
         <Button loading={loading} name={"Sign Up"} loadingName={"Signing up"} />
-        </div>
       </form>
 
       {/* Already a member */}

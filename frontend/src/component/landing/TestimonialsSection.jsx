@@ -5,42 +5,42 @@ const testimonial = {
     "MeetWise has completely changed how our team works. No more scrambling for notes—everything is captured, summarized, and shared instantly.",
   name: "Ingso Limbu",
   role: "Project Manager, TechNova Solutions",
-  avatar: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=200&q=80",
+  avatar: "/testimonials.png",
 };
 
 export default function TestimonialsSection() {
   return (
     <section id="testimonials" className="bg-white py-20">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-6">
-        <header className="text-left">
-          <p className="text-xs font-semibold uppercase tracking-[0.4em] text-[#2563eb]">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-16 px-6 lg:flex-row lg:items-center lg:justify-between">
+        <header className="max-w-md space-y-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#7B8196]">
             Testimonials
           </p>
-          <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">
+          <h2 className="text-3xl font-bold text-[#1B1D29] sm:text-[42px]">
             What People Say About MeetWise
           </h2>
+          <div className="flex items-center gap-2 pt-4">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#1B1D29]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#DDE1EA]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#DDE1EA]" />
+          </div>
         </header>
 
-        <div className="relative overflow-hidden rounded-3xl border border-slate-100 bg-[#f8fafc] p-8 shadow-sm sm:p-12">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center">
+        <div className="relative max-w-2xl rounded-3xl bg-white px-8 py-10 shadow-xl">
+          <div className="absolute -top-8 left-10 h-16 w-16 overflow-hidden rounded-full shadow-lg">
             <img
               src={testimonial.avatar}
               alt={testimonial.name}
-              className="h-20 w-20 rounded-full object-cover shadow"
+              className="h-full w-full object-cover"
             />
-            <div className="space-y-4">
-              <p className="text-lg italic text-slate-700">“{testimonial.quote}”</p>
-              <div>
-                <p className="text-base font-semibold text-slate-900">{testimonial.name}</p>
-                <p className="text-sm text-slate-500">{testimonial.role}</p>
-              </div>
-            </div>
           </div>
-
-          <div className="absolute bottom-6 right-6 hidden flex-col gap-2 text-slate-300 md:flex">
-            <span className="text-2xl">‹</span>
-            <span className="text-2xl">›</span>
-          </div>
+          <blockquote className="pt-10 text-lg leading-8 text-[#4F566B]">
+            “{testimonial.quote}”
+          </blockquote>
+          <footer className="mt-6 text-sm text-[#7B8196]">
+            <p className="text-base font-semibold text-[#1B1D29]">{testimonial.name}</p>
+            <p>{testimonial.role}</p>
+          </footer>
         </div>
       </div>
     </section>

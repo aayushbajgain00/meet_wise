@@ -4,46 +4,56 @@ import { Link } from "react-router-dom";
 export default function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-white py-16">
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-6 lg:flex-row lg:items-start">
-        <div className="max-w-xl space-y-6">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-amber-500">
+      <div className="absolute left-0 top-0 h-1 w-full bg-[#8ec5ff]" aria-hidden="true" />
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-12 px-6 lg:flex-row lg:items-center">
+        <div className="max-w-xl space-y-7">
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#F26A32]">
             Smart Meetings. Clear Insights. Better Results
           </p>
-          <h1 className="text-4xl font-bold leading-tight text-slate-900 sm:text-5xl">
-            Meet <span className="text-[#2563eb]">Smarter</span>, Work Faster, Decide Better
+          <h1 className="text-4xl font-bold leading-[1.1] text-[#112240] sm:text-[52px]">
+            Meet
+            <span className="relative inline-block px-2 text-[#1B3D8F]">
+              Smarter
+              <span className="absolute inset-x-1 bottom-0 h-2 translate-y-1 rounded-full bg-[#F26A32]" aria-hidden="true" />
+            </span>
+            ,
+            <br />
+            Work Faster,
+            <br />
+            Decide Better
           </h1>
-          <p className="text-lg text-slate-600">
-            MeetWise captures, transcribes, and summarizes your meetings in real time. Focus on the conversation while we handle the notes, action items, and insights—so your team never misses a detail.
+          <p className="text-base leading-7 text-[#4F566B]">
+            MeetWise captures, transcribes, and summarizes your meetings in real time. Focus on the conversation while we
+            handle the notes, action items, and insights—so your team never misses a detail.
           </p>
 
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <Link
               to="/signup"
-              className="rounded-full bg-amber-400 px-6 py-3 text-sm font-semibold text-slate-900 shadow hover:bg-amber-300"
+              className="rounded-xl bg-[#F9B233] px-6 py-3 text-sm font-semibold text-[#1B1D29] shadow-sm transition hover:bg-[#f7a816]"
             >
               Find out more
             </Link>
-            <a
-              href="#demo"
-              className="flex items-center gap-3 text-sm font-semibold text-slate-600 hover:text-slate-900"
+            <button
+              type="button"
+              className="flex items-center gap-3 text-sm font-semibold text-[#4F566B] transition hover:text-[#1B1D29]"
             >
-              <span className="grid h-10 w-10 place-items-center rounded-full border border-slate-200 bg-white text-slate-900 shadow">
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-[#F26A32] text-white shadow">
                 ►
               </span>
               Play Demo
-            </a>
+            </button>
           </div>
         </div>
 
         <div className="relative w-full max-w-xl">
-          <div className="overflow-hidden rounded-3xl shadow-xl">
+          <div className="overflow-hidden rounded-3xl shadow-lg">
             <img
-              src="https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=1200&q=80"
-              alt="Team collaborating"
+              src="/section_1.png"
+              alt="Team collaborating in a meeting"
               className="h-full w-full object-cover"
             />
           </div>
-          <div className="absolute -bottom-6 -right-6 hidden h-24 w-24 rounded-2xl bg-[#2563eb]/10 lg:block" />
         </div>
       </div>
     </section>
