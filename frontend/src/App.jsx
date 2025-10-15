@@ -10,8 +10,9 @@ import LandingPage from "./pages/LandingPage.jsx";
 
 // Shell pages
 import HomePage from "./pages/homepage.jsx";
-import AllMeetings from "./pages/Allmeeting.jsx";
-import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
+import AllMeetings from "./pages/allMeetings.jsx";
+// import AddLiveMeeting from "./pages/AddLiveMeeting.jsx";
+import LiveMeeting from "./pages/LiveMeeting.jsx";
 import Upload from "./pages/upload.jsx";
 import Settings from "./pages/settings.jsx";
 import Transcripts from "./pages/Transcripts.jsx";
@@ -23,6 +24,14 @@ import AccountSetting from "./pages/AccountSetting.jsx";
 import LiveMeeting from "./pages/LiveMeeting.jsx";
 import ApiPing from "./pages/ApiPing.jsx";
 import CreateZoomAndSchedule from "./pages/CreateZoomAndSchedule.jsx";
+import CreateTeamsAndSchedule from "./pages/CreateTeamsAndSchedule.jsx";
+
+// Settings subpages
+import ProfileSetting from "./pages/ProfileSetting.jsx";
+import MeetingSetting from "./pages/MeetingSetting.jsx";
+import AccountSetting from "./pages/AccountSettings.jsx";
+
+import Recordings from "./pages/Recordings";
 
 const ProfileSettings = () => <div className="text-xl font-semibold">Profile Settings</div>;
 const AccountSettings = () => <div className="text-xl font-semibold">Account Settings</div>;
