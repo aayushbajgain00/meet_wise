@@ -1,7 +1,7 @@
 // src/pages/ProfileSetting.jsx
 import React, { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
-import { useOutletContext } from "react-router-dom";  // ✅ ADD THIS
+import { useOutletContext } from "react-router-dom";
 
 
 export default function ProfileSetting() {
@@ -17,7 +17,13 @@ export default function ProfileSetting() {
   });
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-   const { profile, setProfile } = useOutletContext(); // 👈 get profile + updater
+   let profile, setProfile;
+   try {
+     ({ profile, setProfile } = useOutletContext() || {});
+   } catch (e) {
+     profile = undefined;
+     setProfile = undefined;
+   }
 
   // Get logged in user from localStorage
   const session = JSON.parse(localStorage.getItem("userInfo"));
@@ -47,7 +53,7 @@ export default function ProfileSetting() {
         }
 
         setForm({
-          email: data.email || "",
+          email: data.email || session?.email || "",
           username: data.username || "",
           firstName,
           lastName,
@@ -82,7 +88,7 @@ export default function ProfileSetting() {
         body: JSON.stringify({ ...form, name }),
       });
       const updated = await res.json();
-      setProfile(updated); // 👈 update Shell sidebar instantly
+  if (setProfile) setProfile(updated); // update Shell sidebar if available
       setMessage("✅ Profile updated!");
     } catch (err) {
       setMessage("❌ Update failed");
@@ -99,14 +105,15 @@ export default function ProfileSetting() {
         {/* Photo */}
         {/* Photo */}
 <div className="flex items-center gap-4">
+
   {form.photo ? (
     <img
       src={form.photo}
       alt="profile"
-      className="w-16 h-16 rounded-full object-cover"
+      className="w-28 h-28 rounded-full object-cover" // 112px x 112px
     />
   ) : (
-    <FaUser className="w-16 h-16 text-gray-400" />
+    <FaUser className="w-28 h-28 text-gray-400" />
   )}
 
   {/* Hidden file input */}
@@ -118,6 +125,10 @@ export default function ProfileSetting() {
     onChange={(e) => {
       const file = e.target.files[0];
       if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+          alert("Photo must be less than 10MB");
+          return;
+        }
         const reader = new FileReader();
         reader.onloadend = () => {
           setForm({ ...form, photo: reader.result }); // base64 preview
@@ -144,8 +155,8 @@ export default function ProfileSetting() {
             type="email"
             name="email"
             value={form.email}
-            disabled // don’t let users edit email here
-            className="border p-2 w-full rounded bg-gray-100"
+            onChange={handleChange}
+            className="border p-2 w-full rounded"
           />
         </div>
 
@@ -245,7 +256,6 @@ export default function ProfileSetting() {
           </button>
         </div>
       </form>
-
       {message && <p className="mt-4">{message}</p>}
     </div>
   );

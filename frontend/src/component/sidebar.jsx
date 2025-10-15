@@ -21,7 +21,6 @@ const mainItems = [
 ];
 
 const settingsSubItems = [
-  { to: `${APP_BASE}/settings/meeting`, label: "Meeting Settings" },
   { to: `${APP_BASE}/settings/profile`, label: "Profile Settings" },
   { to: `${APP_BASE}/settings/account`, label: "Account Settings" },
 ];

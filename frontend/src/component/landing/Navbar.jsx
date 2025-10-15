@@ -3,37 +3,47 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
-    <header className="bg-white">
-      <div className="mx-auto flex  w-full max-w-6xl items-center justify-between px-6">
-        <Link to="/" className="flex items-center gap-3">
-          <img
-            src="/MeetWise_logo.png"
-            alt="Meetwise"
-            className="h-14 w-auto"
-          />
-          <span className="sr-only">Meetwise homepage</span>
+    <header className="border-b border-slate-200 bg-white/90 backdrop-blur">
+      <div className="mx-auto flex h-20 w-full max-w-6xl items-center justify-between px-6">
+        <Link to="/" className="flex items-center gap-2">
+          <div className="grid h-10 w-10 place-items-center rounded-full bg-[#2563eb] text-white shadow">
+            <span className="text-xl font-black">🦉</span>
+          </div>
+          <div>
+            <p className="text-xl font-semibold text-slate-900">Meetwise</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[#2563eb]">
+              Never miss a word
+            </p>
+          </div>
         </Link>
 
-        <p className="hidden text-xl font-semibold text-[#1EA6FF] underline underline-offset-4 sm:block">
-          Never miss a word, Always stay wise
-        </p>
+        <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
+          <a href="#features" className="hover:text-slate-900">
+            Solutions
+          </a>
+          <a href="#testimonials" className="hover:text-slate-900">
+            Testimonials
+          </a>
+          <a href="#team" className="hover:text-slate-900">
+            Team
+          </a>
+        </nav>
 
         <div className="flex items-center gap-3">
           <Link
             to="/login"
-            className="rounded-xl border border-[#1EA6FF] px-4 py-2 text-sm font-semibold text-[#1EA6FF] transition hover:bg-[#EAF6FF]"
+            className="rounded-full border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:text-slate-900"
           >
-            login
+            Login
           </Link>
           <Link
             to="/signup"
-            className="rounded-xl bg-[#1EA6FF] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#178cd6]"
+            className="rounded-full bg-[#2563eb] px-5 py-2 text-sm font-semibold text-white shadow hover:bg-[#1d4ed8]"
           >
-            Sign up
+            Sign Up
           </Link>
         </div>
       </div>
-      <div className="h-px w-full bg-[#85c6ff]" aria-hidden="true" />
     </header>
   );
 }
