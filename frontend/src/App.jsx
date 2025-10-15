@@ -28,7 +28,7 @@ import CreateTeamsAndSchedule from "./pages/CreateTeamsAndSchedule.jsx";
 // Settings subpages
 import ProfileSetting from "./pages/ProfileSetting.jsx";
 import MeetingSetting from "./pages/MeetingSetting.jsx";
-import AccountSetting from "./pages/AccountSetting.jsx";
+import AccountSetting from "./pages/AccountSettings.jsx";
 
 import Recordings from "./pages/Recordings";
 
