@@ -56,11 +56,11 @@ router.post("/upload", upload.single("file"), async (req, res) => {
 
     const generatedMeetingId = new mongoose.Types.ObjectId().toString();
 
-    const newMeeting = await Meeting.create({
+    const meetingDoc = await Meeting.create({
       platform: "upload",
       externalMeetingId: generatedMeetingId,
       topic: req.file.originalname,
-      status: "recorded",
+      status: "processing",
       recordings: [
         {
           fileId: req.file.filename,
@@ -73,7 +73,40 @@ router.post("/upload", upload.single("file"), async (req, res) => {
       transcript: { textFull: "", segments: [], lang: "en", wordCount: 0 },
     });
 
-    res.json(newMeeting);
+    try {
+      const transcription = await transcribeRecording({
+        filePath: req.file.path,
+        originalName: req.file.originalname,
+        mimeType: req.file.mimetype,
+      });
+
+      const transcriptSegments = (transcription.segments || []).map((segment, index) => ({
+        startMs: toMilliseconds(segment.start ?? segment.startMs ?? 0),
+        endMs: toMilliseconds(segment.end ?? segment.endMs ?? 0),
+        text: segment.text || "",
+      }));
+
+      const summaryText = buildSummary(transcription.text, transcriptSegments);
+
+      meetingDoc.status = "done";
+      meetingDoc.transcript = {
+        textFull: transcription.text || "",
+        segments: transcriptSegments,
+        lang: transcription.language || transcription.lang || "en",
+        wordCount: transcription.text
+          ? transcription.text.trim().split(/\s+/).filter(Boolean).length
+          : 0,
+      };
+      meetingDoc.insights = { summary: summaryText };
+      await meetingDoc.save();
+    } catch (transcriptionError) {
+      console.error("Automatic transcription failed", transcriptionError);
+      meetingDoc.status = "error";
+      meetingDoc.error = transcriptionError.message;
+      await meetingDoc.save();
+    }
+
+    res.json(meetingDoc);
   } catch (err) {
     console.error("Error uploading file:", err);
     res.status(500).json({ message: "Upload failed" });
@@ -158,6 +191,7 @@ router.post("/transcribe", upload.single("file"), async (req, res) => {
         subject: meetingDoc.topic,
         summary: summaryText,
         meetingId: meetingDoc._id,
+        message: req.body?.message,
       }).catch((emailErr) =>
         console.warn("Failed to send transcript summary email", emailErr)
       );
@@ -222,6 +256,99 @@ router.delete("/:id", async (req, res) => {
   } catch (err) {
     console.error("Error deleting meeting:", err);
     res.status(500).json({ message: "Delete failed" });
+  }
+});
+
+router.post("/:id/share", async (req, res) => {
+  try {
+    const meeting = await Meeting.findById(req.params.id);
+    if (!meeting) return res.status(404).json({ message: "Meeting not found" });
+
+    const invitees = Array.isArray(req.body?.emails)
+      ? req.body.emails
+      : String(req.body?.emails || "")
+          .split(",")
+          .map((email) => email.trim())
+          .filter(Boolean);
+
+    if (!invitees.length) {
+      return res.status(400).json({ message: "Please provide at least one email" });
+    }
+
+    const summary =
+      meeting.insights?.summary ||
+      buildSummary(meeting.transcript?.textFull, meeting.transcript?.segments);
+
+    await Promise.all(
+      invitees.map((email) =>
+        sendTranscriptSummaryEmail({
+          to: email,
+          subject: meeting.topic || "MeetWise Transcript",
+          summary,
+          meetingId: meeting._id,
+          message: req.body?.message,
+        }).catch((err) => console.warn(`Email failed for ${email}`, err))
+      )
+    );
+
+    res.json({
+      meetingId: meeting._id,
+      sharedWith: invitees,
+      summary,
+    });
+  } catch (err) {
+    console.error("Share transcript failed", err);
+    res.status(500).json({ message: "Unable to share transcript" });
+  }
+});
+
+router.post("/:id/transcribe-recording", async (req, res) => {
+  try {
+    const meeting = await Meeting.findById(req.params.id);
+    if (!meeting) return res.status(404).json({ message: "Meeting not found" });
+
+    const recording = meeting.recordings?.[0];
+    if (!recording?.localPath) {
+      return res.status(400).json({ message: "No recording available for this meeting" });
+    }
+
+    const absolutePath = path.isAbsolute(recording.localPath)
+      ? recording.localPath
+      : path.resolve(recording.localPath);
+
+    const transcription = await transcribeRecording({
+      filePath: absolutePath,
+      originalName: path.basename(absolutePath),
+      mimeType: recording.fileType || "audio/mp4",
+    });
+
+    const transcriptSegments = (transcription.segments || []).map((segment, index) => ({
+      startMs: toMilliseconds(segment.start ?? segment.startMs ?? 0),
+      endMs: toMilliseconds(segment.end ?? segment.endMs ?? 0),
+      text: segment.text || "",
+    }));
+    const summaryText = buildSummary(transcription.text, transcriptSegments);
+
+    meeting.status = "done";
+    meeting.transcript = {
+      textFull: transcription.text || "",
+      segments: transcriptSegments,
+      lang: transcription.language || transcription.lang || "en",
+      wordCount: transcription.text
+        ? transcription.text.trim().split(/\s+/).filter(Boolean).length
+        : 0,
+    };
+    meeting.insights = { summary: summaryText };
+    await meeting.save();
+
+    res.json({
+      meetingId: meeting._id,
+      summary: summaryText,
+      transcript: meeting.transcript,
+    });
+  } catch (err) {
+    console.error("Transcribe recording failed", err);
+    res.status(500).json({ message: "Unable to transcribe meeting recording" });
   }
 });
 

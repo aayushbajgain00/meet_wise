@@ -3,6 +3,7 @@ import { FaCloudUploadAlt, FaFileAlt } from "react-icons/fa";
 import api from "../lib/api";
 import TranscriptViewer from "../component/TranscriptViewer.jsx";
 import Modal from "../component/Modal.jsx";
+import { useToast } from "../component/toastprovider.jsx";
 
 const bytesToMb = (bytes = 0) => (bytes / 1024 / 1024).toFixed(2);
 
@@ -16,6 +17,12 @@ export default function Transcripts() {
   const [activeMeeting, setActiveMeeting] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [shareMeeting, setShareMeeting] = useState(null);
+  const [shareEmails, setShareEmails] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
+  const [shareLoading, setShareLoading] = useState(false);
+  const toast = useToast();
 
   const fetchHistory = async () => {
     setLoading(true);
@@ -111,6 +118,7 @@ export default function Transcripts() {
     setSelectedFile(null);
     setTitle("");
     setCancelled(true);
+    setTranscribeProgress(null);
   };
 
   const handleDelete = async (id) => {
@@ -123,6 +131,47 @@ export default function Transcripts() {
       }
     } catch (err) {
       console.error("Delete failed", err);
+    }
+  };
+
+  const handleShare = (meeting) => {
+    setShareMeeting(meeting);
+    setShareEmails("");
+    setShareMessage("");
+    setShareModalOpen(true);
+  };
+
+  const submitShare = async (event) => {
+    event.preventDefault();
+    if (!shareMeeting) return;
+
+    const emails = String(shareEmails || "")
+      .split(",")
+      .map((email) => email.trim())
+      .filter(Boolean);
+
+    if (!emails.length) {
+      alert("Please enter at least one email address.");
+      return;
+    }
+
+    setShareLoading(true);
+    try {
+      await api.post(`/api/meetings/${shareMeeting._id}/share`, {
+        emails,
+        message: shareMessage,
+      });
+      toast?.push?.("Transcript shared successfully", "success");
+      setShareModalOpen(false);
+      setShareMeeting(null);
+    } catch (error) {
+      console.error("Share failed", error);
+      toast?.push?.(
+        error?.response?.data?.message || error.message || "Failed to share transcript.",
+        "error"
+      );
+    } finally {
+      setShareLoading(false);
     }
   };
 
@@ -245,6 +294,13 @@ export default function Transcripts() {
                   </button>
                   <button
                     type="button"
+                    onClick={() => handleShare(meeting)}
+                    className="px-4 py-2 rounded-md border border-sky-500 text-sky-500 text-sm font-semibold hover:bg-sky-50"
+                  >
+                    Share
+                  </button>
+                  <button
+                    type="button"
                     onClick={() => handleDelete(meeting._id)}
                     className="px-4 py-2 rounded-md border border-red-300 text-red-600 text-sm font-semibold hover:bg-red-50"
                   >
@@ -273,6 +329,59 @@ export default function Transcripts() {
             segments={activeMeeting.transcript?.segments || []}
             metadata={{ name: activeMeeting.topic }}
           />
+        </Modal>
+      )}
+
+      {shareModalOpen && shareMeeting && (
+        <Modal
+          title={`Share “${shareMeeting.topic || "Transcript"}”`}
+          onClose={() => setShareModalOpen(false)}
+        >
+          <form className="space-y-4" onSubmit={submitShare}>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">
+                Email addresses
+              </label>
+              <input
+                type="text"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                placeholder="teammate@example.com, manager@example.com"
+                value={shareEmails}
+                onChange={(event) => setShareEmails(event.target.value)}
+                disabled={shareLoading}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-1">
+                Message (optional)
+              </label>
+              <textarea
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                rows={3}
+                placeholder="Add a short note"
+                value={shareMessage}
+                onChange={(event) => setShareMessage(event.target.value)}
+                disabled={shareLoading}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShareModalOpen(false)}
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600"
+                disabled={shareLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-md bg-sky-500 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600 disabled:opacity-70"
+                disabled={shareLoading}
+              >
+                {shareLoading ? "Sharing..." : "Share"}
+              </button>
+            </div>
+          </form>
         </Modal>
       )}
     </div>

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { toastRef } from "../lib/api";
 
 // Context
 const ToastCtx = createContext(null);
@@ -17,6 +18,12 @@ export default function ToastProvider({ children }) {
     setToasts((t) => [...t, { id, msg, type }]);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 4000);
   }, []);
+
+  useEffect(() => {
+    if (toastRef) {
+      toastRef.current = { push };
+    }
+  }, [push]);
 
   return (
     <ToastCtx.Provider value={{ push }}>
