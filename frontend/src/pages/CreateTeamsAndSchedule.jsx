@@ -24,8 +24,6 @@ function readUser() {
 async function refreshUserSummary(id) {
   const { data } = await api.get(`/api/user/${id}/summary`);
   const u = readUser();
-  3
-  
   if (u && (u._id === id || u.userId === id)) {
     localStorage.setItem("userInfo", JSON.stringify({ ...u, ...data }));
   }
@@ -34,7 +32,6 @@ async function refreshUserSummary(id) {
 
 export default function CreateTeamsAndSchedule() {
   const userId = getUserId();
-
   const defaultTz = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC",
     []
@@ -61,7 +58,7 @@ export default function CreateTeamsAndSchedule() {
   const popupRef = useRef(null);
   const pollRef = useRef(null);
 
-  // ✅ Refresh Teams connection status periodically
+  // 🔄 Periodically refresh Teams connection
   useEffect(() => {
     if (!userId) return;
     refreshUserSummary(userId)
@@ -95,7 +92,6 @@ export default function CreateTeamsAndSchedule() {
     }, 2000);
   };
 
-  // ✅ This popup is ONLY for Teams OAuth connection
   const openTeamsConnect = () => {
     if (!userId) return setError("You must be logged in first.");
     if (teamsConnected) return;
@@ -106,16 +102,28 @@ export default function CreateTeamsAndSchedule() {
     startPolling();
   };
 
-  // ✅ Create + schedule Teams meeting
+  // ✅ Create + schedule Teams meeting with validation
   const tryCreate = async () => {
     setError("");
     setResult(null);
+
     if (!userId)
       return setError("No user found in localStorage. Please log in again.");
 
     const localDateTime = new Date(`${date}T${time}:00`);
-    const startIsoUtc = localDateTime.toISOString();
+    const now = new Date();
 
+    // ⛔ Validation
+    if (isNaN(localDateTime.getTime())) {
+      return setError("Invalid date or time. Please check your input.");
+    }
+    if (localDateTime <= now) {
+      return setError(
+        "Meeting time must be in the future. Please select a valid date and time."
+      );
+    }
+
+    const startIsoUtc = localDateTime.toISOString();
     const body = {
       topic: topic.trim(),
       start_time: startIsoUtc,
@@ -180,9 +188,11 @@ export default function CreateTeamsAndSchedule() {
               type="date"
               className="w-full border rounded p-2"
               value={date}
+              min={new Date().toISOString().split("T")[0]} // ⛔ no past dates
               onChange={(e) => setDate(e.target.value)}
             />
           </label>
+
           <label className="block">
             <span className="text-sm">Time</span>
             <input
