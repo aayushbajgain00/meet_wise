@@ -5,6 +5,7 @@ import "./index.css";
 import App from "./App.jsx";
 import { MsalProvider } from "@azure/msal-react";
 import { PublicClientApplication } from "@azure/msal-browser";
+import ToastProvider from "./component/toastprovider.jsx";
 
 const msalConfig = {
   auth: {
@@ -21,7 +22,9 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <MsalProvider instance={pca}>
       <BrowserRouter>
-        <App />
+        <ToastProvider>
+          <App />
+        </ToastProvider>
       </BrowserRouter>
     </MsalProvider>
   </StrictMode>

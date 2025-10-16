@@ -31,7 +31,7 @@ const getTransporter = () => {
   return buildTransporter();
 };
 
-export const sendTranscriptSummaryEmail = async ({ to, subject, summary, meetingId, transcriptUrl }) => {
+export const sendTranscriptSummaryEmail = async ({ to, subject, summary, meetingId, transcriptUrl, message }) => {
   if (!to) {
     console.warn("Email not sent: missing recipient");
     return;
@@ -44,10 +44,12 @@ export const sendTranscriptSummaryEmail = async ({ to, subject, summary, meeting
   const safeSubject = subject?.trim() || "Transcript summary";
   const safeSummary = summary || "(No transcript text available)";
 
-  const textBody = `Here is your transcript summary for "${safeSubject}":\n\n${safeSummary}\n\nMeeting ID: ${meetingId}`;
+  const noteText = message?.trim() ? `\n\nNote from sender:\n${message.trim()}` : "";
+  const textBody = `Here is your transcript summary for "${safeSubject}":\n\n${safeSummary}${noteText}\n\nMeeting ID: ${meetingId}`;
   const htmlBody = `
     <p>Here is your transcript summary for <strong>${safeSubject}</strong>:</p>
     <blockquote>${safeSummary}</blockquote>
+    ${message?.trim() ? `<p><strong>Note:</strong> ${message.trim()}</p>` : ""}
     <p>Meeting ID: ${meetingId}</p>
     ${transcriptUrl ? `<p><a href="${transcriptUrl}">View full transcript</a></p>` : ""}
   `;
