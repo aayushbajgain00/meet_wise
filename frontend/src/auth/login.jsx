@@ -5,9 +5,13 @@ import Swal from "sweetalert2";
 import AuthLayout from "./authLayout";
 import Button from "../component/button";
 import { useMsal } from "@azure/msal-react";
-import { EmailIcon, GoogleLogo, MicrosoftLogo, PasswordIcon } from "../component/svgs";
+import {
+  EmailIcon,
+  GoogleLogo,
+  MicrosoftLogo,
+  PasswordIcon,
+} from "../component/svgs";
 import useGoogleAuth from "../lib/useGoogleAuth";
-
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -49,26 +53,47 @@ export default function Login() {
     setMicrosoftLoading(true);
     try {
       const loginRequest = {
-        scopes: ["User.Read", "openid", "profile", "email", "Calendars.Read", "Calendars.ReadWrite"],
+        scopes: [
+          "User.Read",
+          "openid",
+          "profile",
+          "email",
+          "Calendars.Read",
+          "Calendars.ReadWrite",
+        ],
         prompt: "select_account",
       };
 
-      const response = await instance.loginRedirect(loginRequest);
+      const loginResponse = await instance.loginPopup(loginRequest);
+      const account =
+        loginResponse.account ||
+        instance.getActiveAccount() ||
+        instance.getAllAccounts()[0];
 
-      // Sending Microsoft token for verification
+      const tokenResponse = await instance
+        .acquireTokenSilent({ ...loginRequest, account })
+        .catch(() => instance.acquireTokenPopup({ ...loginRequest, account }));
+
+      const accessToken =
+        loginResponse.accessToken || tokenResponse?.accessToken;
+
+      if (!accessToken) {
+        throw new Error("No Microsoft access token returned");
+      }
+
+      if (account) {
+        instance.setActiveAccount(account);
+      }
+
       const { data } = await axios.post(
-        "http://localhost:8000/api/user/microsoft-login",
-        { accessToken: response.accessToken },
+        "http://localhost:5000/api/user/microsoft-login",
+        { accessToken },
         { headers: { "Content-Type": "application/json" } }
       );
 
-
       if (data.success) {
         const name =
-          data.user?.name ||
-          response.account?.name ||
-          response.account?.username ||
-          "User";
+          data.user?.name || account?.name || account?.username || "User";
 
         localStorage.setItem("mw_user_name", name);
         localStorage.setItem("userInfo", JSON.stringify(data.user));
@@ -136,7 +161,8 @@ export default function Login() {
           showConfirmButton: false,
         });
       } else {
-        const name = data.name || data.user?.name || email.split("@")[0] || "User";
+        const name =
+          data.name || data.user?.name || email.split("@")[0] || "User";
 
         localStorage.setItem("mw_user_name", name);
         localStorage.setItem("userInfo", JSON.stringify(data));
@@ -169,44 +195,41 @@ export default function Login() {
 
   return (
     <AuthLayout>
-
-        <form className="space-y-5" onSubmit={submitHandler}>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Email address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <EmailIcon/>
-              </div>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
-                placeholder="Enter your email"
-              />
-            </div> 
+      <form className="space-y-5" onSubmit={submitHandler}>
+        <div>
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Email address
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <EmailIcon />
+            </div>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-colors"
+              placeholder="Enter your email"
+            />
+          </div>
         </div>
 
-
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <PasswordIcon/>
-
+        <div>
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Password
+          </label>
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <PasswordIcon />
             </div>
             <input
               type="password"
@@ -260,7 +283,7 @@ export default function Login() {
               "Logging in..."
             ) : (
               <>
-                <GoogleLogo/>
+                <GoogleLogo />
                 Google
               </>
             )}
@@ -275,7 +298,7 @@ export default function Login() {
               "Logging in..."
             ) : (
               <>
-                <MicrosoftLogo/>
+                <MicrosoftLogo />
                 Microsoft
               </>
             )}
