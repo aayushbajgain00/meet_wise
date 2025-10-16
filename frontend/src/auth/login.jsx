@@ -46,6 +46,8 @@ export default function Login() {
   });
 
   const handleMicrosoftLogin = async () => {
+    console.log("sure");
+    
     setMicrosoftLoading(true);
     try {
       const loginRequest = {
@@ -54,10 +56,12 @@ export default function Login() {
       };
 
       const response = await instance.loginRedirect(loginRequest);
+      console.log(response.data);
+      
 
       // Sending Microsoft token for verification
       const { data } = await axios.post(
-        "http://localhost:8000/api/user/microsoft-login",
+        "http://localhost:5000/api/user/microsoft-login",
         { accessToken: response.accessToken },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -83,6 +87,7 @@ export default function Login() {
         });
 
         navigate("/app");
+        
       }
     } catch (error) {
       Swal.fire({

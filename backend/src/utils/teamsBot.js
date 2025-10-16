@@ -4,60 +4,91 @@ import path from "path";
 import { PuppeteerScreenRecorder } from "puppeteer-screen-recorder";
 
 export async function joinTeamsMeeting(meetingUrl) {
-  console.log(`🤖 Joining Teams meeting: ${meetingUrl}`);
+  console.log(`🤖 Bot preparing to join Teams meeting: ${meetingUrl}`);
 
   const recordingsDir = path.join(process.cwd(), "public/recordings");
   fs.mkdirSync(recordingsDir, { recursive: true });
   const filePath = path.join(recordingsDir, `teams_meeting_${Date.now()}.mp4`);
 
+  // ⚙️ Puppeteer launch configuration
   const browser = await puppeteer.launch({
     headless: false,
+    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", // ✅ use your real Chrome
+    userDataDir: `C:/Users/${process.env.USERNAME}/AppData/Local/Google/Chrome/User Data/Default`, // ✅ your profile
+    ignoreDefaultArgs: ["--enable-automation"],
     defaultViewport: null,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
-      "--use-fake-ui-for-media-stream",
-      "--use-fake-device-for-media-stream",
       "--disable-dev-shm-usage",
       "--window-size=1366,768",
       "--autoplay-policy=no-user-gesture-required",
-      "--mute-audio",
       "--disable-infobars",
-      "--allow-file-access-from-files",
       "--use-fake-ui-for-media-stream",
+      "--use-fake-device-for-media-stream",
+      "--use-file-for-fake-video-capture=./fake.y4m",
+      "--use-file-for-fake-audio-capture=./fake.wav",
+      "--allow-file-access-from-files",
     ],
   });
 
   const page = await browser.newPage();
-  await page.goto(meetingUrl, { waitUntil: "domcontentloaded" });
 
-  // 💡 Handle "Join on Web"
-  try {
-    await page.waitForSelector('a[data-tid="joinOnWeb"]', { timeout: 20000 });
-    await page.click('a[data-tid="joinOnWeb"]');
-    console.log("✅ Clicked 'Join on Web'");
-  } catch {
-    console.log("⚠️ 'Join on Web' not found — likely already on pre-join");
-  }
+  // 🧠 make it look like a real user browser
+  await page.evaluateOnNewDocument(() => {
+    Object.defineProperty(navigator, "webdriver", { get: () => false });
+  });
 
-  // 💡 Allow permissions if popup appears
+  await page.setViewport({ width: 1366, height: 768 });
+  await page.setUserAgent(
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+      "(KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+  );
+
+  console.log("🌐 Opening meeting page...");
+  await page.goto(meetingUrl, { waitUntil: "networkidle2", timeout: 0 });
+
+  // 1️⃣ Click “Join on Web Instead”
   try {
-    const permButton = await page.$("button:has-text('Allow')");
-    if (permButton) {
-      await permButton.click();
-      console.log("🔓 Allowed camera/mic permissions");
+    const joinOnWeb = await Promise.race([
+      page.waitForSelector("a[data-tid='joinOnWeb']", { timeout: 15000 }),
+      page.waitForSelector("button[data-tid='joinOnWeb']", { timeout: 15000 }),
+    ]);
+    if (joinOnWeb) {
+      await joinOnWeb.click();
+      console.log("✅ Clicked 'Join on Web Instead'");
     }
-  } catch {}
-
-  // 💡 Enter Bot Name
-  try {
-    await page.waitForSelector('input[type="text"]', { timeout: 15000 });
-    await page.type('input[type="text"]', "MeetWise Bot");
   } catch {
-    console.log("⚠️ Could not type name");
+    console.log("⚠️ 'Join on Web Instead' not found — may already be on pre-join page");
   }
 
-  // 💡 Disable mic and camera
+  // 2️⃣ Handle “Join as Guest” (if appears)
+  try {
+    await page.waitForSelector("button[data-tid='joinAsGuest'], button:has-text('Join as guest')", {
+      timeout: 15000,
+    });
+    await page.click("button[data-tid='joinAsGuest'], button:has-text('Join as guest')");
+    console.log("👤 Clicked 'Join as Guest'");
+  } catch {
+    console.log("⚠️ No 'Join as Guest' button — skipping");
+  }
+
+  // 3️⃣ Enter guest name
+  try {
+    await page.waitForSelector('input[data-tid="guest-name-input"], input[type="text"]', {
+      timeout: 20000,
+    });
+    await page.click('input[data-tid="guest-name-input"], input[type="text"]', { clickCount: 3 });
+    await page.type('input[data-tid="guest-name-input"], input[type="text"]', "MeetWise Bot 🤖", {
+      delay: 40,
+    });
+    console.log("✏️ Entered guest name");
+    await page.keyboard.press("Enter");
+  } catch {
+    console.log("⚠️ Could not find or type name field — continuing");
+  }
+
+  // 4️⃣ Disable mic & camera
   try {
     const selectors = [
       '[data-tid="toggle-microphone"]',
@@ -72,40 +103,52 @@ export async function joinTeamsMeeting(meetingUrl) {
     console.log("⚠️ Mic/cam toggle failed:", e.message);
   }
 
-  // 💡 Click Join button
+  // 5️⃣ Click “Join now”
   try {
-    const joinBtn = await page.waitForSelector(
-      'button[data-tid="prejoin-join-button"]',
-      { timeout: 25000 }
-    );
-    await joinBtn.click();
-    console.log("🚀 Joining meeting...");
+    let joinBtn = null;
+    for (let i = 0; i < 5; i++) {
+      joinBtn =
+        (await page.$('button[data-tid="prejoin-join-button"]')) ||
+        (await page.$('button[aria-label*="Join now"]')) ||
+        (await page.$('button:has-text("Join now")'));
+      if (joinBtn) break;
+      await page.waitForTimeout(2000);
+    }
+
+    if (joinBtn) {
+      await joinBtn.click();
+      console.log("🚀 Clicked 'Join now' button");
+    } else {
+      console.log("⚠️ Could not find 'Join now' — trying Enter key");
+      await page.keyboard.press("Enter");
+    }
   } catch {
-    console.log("⚠️ Join button not found — maybe auto-joined");
+    console.log("⚠️ Failed to click 'Join now' button");
   }
 
-  // 💡 Handle Lobby (“Someone will let you in”)
+  // 6️⃣ Retry if “Rejoin call” appears
   try {
-    await page.waitForFunction(
-      () => document.body.innerText.includes("Someone in the meeting should let you in"),
-      { timeout: 10000 }
-    );
-    console.log("🕓 In lobby — waiting to be admitted...");
-  } catch {
-    console.log("✅ Skipped lobby or already inside meeting");
-  }
-
-  // 💡 Wait for actual meeting video UI
-  try {
-    await page.waitForSelector('[data-tid="meeting-call-controls"], canvas, video', {
-      timeout: 60000,
+    const rejoinBtn = await page.waitForSelector('button:has-text("Rejoin call")', {
+      timeout: 10000,
     });
-    console.log("✅ Meeting UI detected — starting recording");
+    if (rejoinBtn) {
+      await rejoinBtn.click();
+      console.log("🔁 Clicked 'Rejoin call' to recover connection");
+    }
+  } catch {}
+
+  // 7️⃣ Wait for meeting UI
+  try {
+    await page.waitForSelector(
+      '[data-tid="meeting-call-controls"], video, canvas, [aria-label*="Leave"]',
+      { timeout: 60000 }
+    );
+    console.log("✅ Successfully joined the meeting!");
   } catch {
-    console.log("⚠️ Meeting video UI not detected, continuing anyway");
+    console.log("⚠️ Could not detect meeting UI — continuing anyway");
   }
 
-  // 🎥 Start recording
+  // 8️⃣ Start recording
   const recorder = new PuppeteerScreenRecorder(page, {
     followNewTab: true,
     fps: 24,
@@ -116,47 +159,49 @@ export async function joinTeamsMeeting(meetingUrl) {
   await recorder.start(filePath);
   console.log(`🎬 Recording started → ${filePath}`);
 
-  // 🧠 Monitor until meeting ends
+  // 9️⃣ Monitor until meeting ends or 30 min timeout
+  const RECORD_TIME_MS = 30 * 60 * 1000;
+  console.log(`🕒 Recording will run up to ${RECORD_TIME_MS / 60000} minutes`);
+
+  const start = Date.now();
   let meetingEnded = false;
   let joined = false;
 
-  const interval = setInterval(async () => {
+  while (Date.now() - start < RECORD_TIME_MS && !meetingEnded) {
     try {
       const result = await page.evaluate(() => {
         const txt = document.body.innerText.toLowerCase();
-        const hasControls = !!document.querySelector(
-          '[data-tid="meeting-call-controls"]'
-        );
+        const hasControls = !!document.querySelector('[data-tid="meeting-call-controls"]');
         return {
           joined: hasControls,
           ended:
             txt.includes("call ended") ||
             txt.includes("left the meeting") ||
-            txt.includes("something went wrong"),
+            txt.includes("something went wrong") ||
+            txt.includes("rejoin"),
         };
       });
 
       if (result.joined) joined = true;
-      if (joined && result.ended && !meetingEnded) {
+      if (joined && result.ended) {
         meetingEnded = true;
-        clearInterval(interval);
         console.log("🛑 Meeting ended — stopping recording");
         await recorder.stop();
-        await browser.close();
-        console.log(`💾 Saved recording → ${filePath}`);
+        break;
       }
     } catch (err) {
-      console.log("⚠️ check error:", err.message);
+      console.log("⚠️ Monitor error:", err.message);
     }
-  }, 8000);
+    await new Promise((r) => setTimeout(r, 8000));
+  }
 
-  browser.on("disconnected", async () => {
-    if (!meetingEnded) {
-      console.log("🔻 Browser closed manually — finalizing...");
-      try {
-        await recorder.stop();
-        console.log(`💾 Saved before exit → ${filePath}`);
-      } catch {}
-    }
-  });
+  // 🔚 Stop & close
+  if (!meetingEnded) {
+    console.log("🛑 Time limit reached — stopping recording");
+    await recorder.stop();
+  }
+
+  await page.waitForTimeout(3000);
+  await browser.close();
+  console.log(`💾 Saved MP4 recording → ${filePath}`);
 }
