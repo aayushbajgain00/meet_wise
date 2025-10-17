@@ -115,6 +115,61 @@ router.post("/create-and-schedule", async (req, res) => {
   }
 });
 
+// POST /teams/meetings/join
+router.post("/join", async (req, res) => {
+  try {
+    const { meetingUrl } = req.body;
+
+    if (!meetingUrl) {
+      return res.status(400).json({ message: "Meeting URL is required." });
+    }
+
+    console.log(`🤖 Bot preparing to join existing Teams meeting: ${meetingUrl}`);
+
+    // Fire Puppeteer bot asynchronously (no await so frontend responds fast)
+    joinTeamsMeeting(meetingUrl)
+      .then(() => console.log("✅ Bot finished joining & recording."))
+      .catch((err) =>
+        console.error("❌ Bot failed during join:", err.message)
+      );
+
+    res.status(200).json({
+      success: true,
+      message: "Bot is joining and recording the Teams meeting...",
+      meetingUrl,
+    });
+  } catch (err) {
+    console.error("❌ Error in /meetings/join:", err);
+    res.status(500).json({ message: "Failed to join Teams meeting." });
+  }
+});
+
+router.post("/meetings/join", async (req, res) => {
+  try {
+    const { meetingUrl } = req.body;
+
+    if (!meetingUrl)
+      return res.status(400).json({ message: "Meeting URL is required." });
+
+    console.log(`🤖 Bot preparing to join existing Teams meeting: ${meetingUrl}`);
+
+    // Fire Puppeteer bot (non-blocking)
+    joinTeamsMeeting(meetingUrl)
+      .then(() => console.log("✅ Bot finished joining & recording."))
+      .catch((err) => console.error("❌ Bot failed:", err.message));
+
+    // Respond quickly to frontend
+    return res.status(200).json({
+      success: true,
+      message: "Bot is joining and recording the Teams meeting...",
+      meetingUrl,
+    });
+  } catch (err) {
+    console.error("❌ Error in /meetings/join:", err);
+    res.status(500).json({ message: "Failed to join Teams meeting." });
+  }
+});
+
 export default router;
 
 

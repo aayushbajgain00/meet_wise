@@ -1,194 +1,113 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Swal from 'sweetalert2';
+import React, { useState } from "react";
+import api from "../lib/api";
 
-const LiveMeeting = () => {
-  const [meetingName, setMeetingName] = useState('');
-  const [meetingLink, setMeetingLink] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('English (Global)');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [errors, setErrors] = useState({});
-  const dropdownRef = useRef(null);
+export default function AddLiveMeeting({ userName = "Aayush" }) {
+  const [meetingName, setMeetingName] = useState("");
+  const [meetingLink, setMeetingLink] = useState("");
+  const [language, setLanguage] = useState("English (Global)");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const languages = [
-    'English (Global)',
-    'Nepali',
-    'Hindi',
-    'Japanese',
-    'Chinese',
-    'French',
-  ];
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!meetingName.trim()) {
-      newErrors.meetingName = 'Meeting name is required';
-    }
+  // ✅ Function to trigger backend bot
+  const handleStart = async () => {
+    setError("");
+    setSuccess("");
 
     if (!meetingLink.trim()) {
-      newErrors.meetingLink = 'Meeting link is required';
-    } else if (!isValidUrl(meetingLink)) {
-      newErrors.meetingLink = 'Please enter a valid URL';
+      setError("Please enter a valid Microsoft Teams meeting link.");
+      return;
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    if (!meetingLink.includes("teams.microsoft.com")) {
+      setError("This is not a valid Teams meeting link.");
+      return;
+    }
 
-  const isValidUrl = (string) => {
+    setLoading(true);
     try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
+      const { data } = await api.post("/teams/meetings/join", {
+        meetingUrl: meetingLink,
+        meetingName: meetingName || "Live Meeting",
+        language,
+      });
+      console.log("Bot response:", data);
+      setSuccess("🤖 MeetWise Bot is joining and recording your Teams meeting!");
+    } catch (err) {
+      console.error("Join meeting error:", err);
+      setError(
+        err?.response?.data?.message ||
+          "Failed to start the bot. Please try again."
+      );
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleStartMeeting = () => {
-    if (validateForm()) {
-    console.log('Meeting Details:', {
-        name: meetingName,
-        link: meetingLink,
-        language: selectedLanguage
-    });
-    Swal.fire({
-        title: `Meeting "${meetingName}" started successfully!`,
-        icon: "success",
-        toast: true,
-        timer: 3000,
-        position: "top-right",
-        showConfirmButton: false,
-    });
-    }
-  };
-
-  const handleCancel = () => {
-    setMeetingName('');
-    setMeetingLink('');
-    setSelectedLanguage('English (Global)');
-    setErrors({});
   };
 
   return (
-    <div className="min-w-xl mx-auto p-8 bg-white rounded-2xl shadow-lg">
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Meeting Name
-        </label>
+    <div className="max-w-lg mx-auto p-6 bg-white shadow rounded mt-8 space-y-4">
+      <h2 className="text-xl font-semibold text-gray-800">
+        Add Microsoft Teams Live Meeting
+      </h2>
+
+      <label className="block">
+        <span className="text-sm">Meeting Name (optional)</span>
         <input
           type="text"
+          className="w-full border rounded p-2 mt-1"
+          placeholder="e.g. Project Sync"
           value={meetingName}
-          onChange={(e) => {
-            setMeetingName(e.target.value);
-            if (errors.meetingName) setErrors({...errors, meetingName: ''});
-          }}
-          placeholder="Eg: Your project name"
-          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-            errors.meetingName ? 'border-red-500' : 'border-gray-300'
-          }`}
+          onChange={(e) => setMeetingName(e.target.value)}
         />
-        {errors.meetingName && (
-          <p className="text-red-500 text-xs mt-1">{errors.meetingName}</p>
-        )}
-      </div>
-      
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Meeting Link
-        </label>
+      </label>
+
+      <label className="block">
+        <span className="text-sm">Microsoft Teams Meeting Link</span>
         <input
-          type="url"
+          type="text"
+          className="w-full border rounded p-2 mt-1"
+          placeholder="Paste your Teams meeting link here"
           value={meetingLink}
-          onChange={(e) => {
-            setMeetingLink(e.target.value);
-            if (errors.meetingLink) setErrors({...errors, meetingLink: ''});
-          }}
-          placeholder="eg: https://www.figma.com/design"
-          className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 ${
-            errors.meetingLink ? 'border-red-500' : 'border-gray-300'
-          }`}
+          onChange={(e) => setMeetingLink(e.target.value)}
         />
-        {errors.meetingLink && (
-          <p className="text-red-500 text-xs mt-1">{errors.meetingLink}</p>
-        )}
-      </div>
-      
-      <div className="mb-8" ref={dropdownRef}>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Meeting Language
-        </label>
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-left flex justify-between items-center hover:border-gray-400"
-          >
-            <span className="text-gray-700">{selectedLanguage}</span>
-            <svg 
-              className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          
-          {isDropdownOpen && (
-            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-              {languages.map((language, index) => (
-                <button
-                  key={language}
-                  type="button"
-                  onClick={() => {
-                    setSelectedLanguage(language);
-                    setIsDropdownOpen(false);
-                  }}
-                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-150 ${
-                    selectedLanguage === language 
-                      ? 'bg-blue-50 text-blue-600 font-medium' 
-                      : 'text-gray-700'
-                  } ${
-                    index === 0 ? 'rounded-t-lg' : 
-                    index === languages.length - 1 ? 'rounded-b-lg' : ''
-                  }`}
-                >
-                  {language}
-                </button>
-              ))}
-            </div>
-          )}
+      </label>
+
+      {error && (
+        <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded">
+          {error}
         </div>
-      </div>
-      
-      <div className="flex gap-4">
-        <button
-          onClick={handleCancel}
-          className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors duration-200"
+      )}
+
+      {success && (
+        <div className="p-3 bg-green-50 text-green-700 border border-green-200 rounded">
+          {success}
+        </div>
+      )}
+
+      <label className="block">
+        <span className="text-sm">Meeting Language</span>
+        <select
+          className="w-full border rounded p-2 mt-1"
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
         >
-          Cancel
-        </button>
-        <button
-          onClick={handleStartMeeting}
-          className="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200"
-          disabled={!meetingName.trim() || !meetingLink.trim()}
-        >
-          Start
-        </button>
-      </div>
+          <option>English (Global)</option>
+          <option>English (US)</option>
+          <option>English (UK)</option>
+          <option>Nepali</option>
+          <option>Hindi</option>
+          <option>Spanish</option>
+          <option>French</option>
+        </select>
+      </label>
+
+      <button
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded disabled:opacity-50"
+        onClick={handleStart}
+        disabled={loading}
+      >
+        {loading ? "Starting Bot..." : "Join Meeting with Bot"}
+      </button>
     </div>
   );
-};
-
-export default LiveMeeting;
+}
