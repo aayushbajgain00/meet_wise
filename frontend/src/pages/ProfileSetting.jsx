@@ -1,8 +1,6 @@
-// src/pages/ProfileSetting.jsx
 import React, { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
-import { useOutletContext } from "react-router-dom";  // ✅ ADD THIS
-
+import { useOutletContext } from "react-router-dom";
 
 export default function ProfileSetting() {
   const [form, setForm] = useState({
@@ -15,15 +13,14 @@ export default function ProfileSetting() {
     language: "English",
     timezone: "(GMT-05:00) Eastern Time",
   });
+  const [photoFile, setPhotoFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-   const { profile, setProfile } = useOutletContext(); // 👈 get profile + updater
+  const { profile, setProfile } = useOutletContext();
 
-  // Get logged in user from localStorage
   const session = JSON.parse(localStorage.getItem("userInfo"));
   const userId = session?._id;
 
-  // Load user profile
   useEffect(() => {
     async function fetchProfile() {
       if (!userId) {
@@ -31,26 +28,17 @@ export default function ProfileSetting() {
         setLoading(false);
         return;
       }
-
       try {
         const res = await fetch(`/api/user/profile?id=${userId}`);
         if (!res.ok) throw new Error("Failed to load profile");
         const data = await res.json();
 
-        // Split full name into first + last
-        let firstName = "";
-        let lastName = "";
-        if (data.name) {
-          const [first, ...rest] = data.name.split(" ");
-          firstName = first;
-          lastName = rest.join(" ");
-        }
-
+        const [first, ...rest] = (data.name || "").split(" ");
         setForm({
           email: data.email || "",
           username: data.username || "",
-          firstName,
-          lastName,
+          firstName: first || "",
+          lastName: rest.join(" "),
           bio: data.bio || "",
           photo: data.photo || "",
           language: data.language || "English",
@@ -66,25 +54,43 @@ export default function ProfileSetting() {
     fetchProfile();
   }, [userId]);
 
-  // Handle input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Save profile
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setPhotoFile(file);
+    const preview = URL.createObjectURL(file);
+    setForm({ ...form, photo: preview });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const name = `${form.firstName} ${form.lastName}`.trim();
+
     try {
+      const formData = new FormData();
+      formData.append("email", form.email);
+      formData.append("username", form.username);
+      formData.append("name", name);
+      formData.append("bio", form.bio);
+      formData.append("language", form.language);
+      formData.append("timezone", form.timezone);
+      if (photoFile) formData.append("photo", photoFile);
+
       const res = await fetch(`/api/user/profile?id=${userId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, name }),
+        body: formData,
       });
+
+      if (!res.ok) throw new Error("Update failed");
       const updated = await res.json();
-      setProfile(updated); // 👈 update Shell sidebar instantly
-      setMessage("✅ Profile updated!");
+      setProfile(updated);
+      setMessage("✅ Profile updated successfully!");
     } catch (err) {
+      console.error(err);
       setMessage("❌ Update failed");
     }
   };
@@ -97,45 +103,33 @@ export default function ProfileSetting() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Photo */}
-        {/* Photo */}
-<div className="flex items-center gap-4">
-  {form.photo ? (
-    <img
-      src={form.photo}
-      alt="profile"
-      className="w-16 h-16 rounded-full object-cover"
-    />
-  ) : (
-    <FaUser className="w-16 h-16 text-gray-400" />
-  )}
+        <div className="flex items-center gap-4">
+          {form.photo ? (
+            <img
+              src={form.photo.startsWith("/uploads") ? `${form.photo}` : form.photo}
+              alt="profile"
+              className="w-16 h-16 rounded-full object-cover"
+            />
+          ) : (
+            <FaUser className="w-16 h-16 text-gray-400" />
+          )}
 
-  {/* Hidden file input */}
-  <input
-    type="file"
-    accept="image/*"
-    id="photo-upload"
-    className="hidden"
-    onChange={(e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setForm({ ...form, photo: reader.result }); // base64 preview
-        };
-        reader.readAsDataURL(file);
-      }
-    }}
-  />
+          <input
+            type="file"
+            accept="image/*"
+            id="photo-upload"
+            className="hidden"
+            onChange={handleFileChange}
+          />
 
-  {/* Button to trigger file input */}
-  <button
-    type="button"
-    onClick={() => document.getElementById("photo-upload").click()}
-    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-  >
-    {form.photo ? "Change Photo" : "Upload Photo"}
-  </button>
-</div>
+          <button
+            type="button"
+            onClick={() => document.getElementById("photo-upload").click()}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            {form.photo ? "Change Photo" : "Upload Photo"}
+          </button>
+        </div>
 
         {/* Email */}
         <div>
@@ -144,7 +138,7 @@ export default function ProfileSetting() {
             type="email"
             name="email"
             value={form.email}
-            disabled // don’t let users edit email here
+            disabled
             className="border p-2 w-full rounded bg-gray-100"
           />
         </div>

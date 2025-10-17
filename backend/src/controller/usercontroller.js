@@ -2,6 +2,7 @@ import axios from "axios";
 import User from "../model/user.js";
 import jwt from "jsonwebtoken";
 
+
 export const registerUser = async (req, res, next) => {
   try {
     let { email, password } = req.body;
@@ -169,6 +170,7 @@ const verifyMicrosoftToken = async (accessToken) => {
     throw new Error('Invalid Microsoft token');
   }
 }
+
 // Get current user profile
 export const getProfile = async (req, res, next) => {
   try {
@@ -192,20 +194,29 @@ export const getProfile = async (req, res, next) => {
     next(err);
   }
 };
-
-// Update user profile
 export const updateProfile = async (req, res, next) => {
   try {
-    console.log("Update profile request body:", req.body);
+    console.log("🟢 Content-Type:", req.headers["content-type"]);
+    console.log("🟢 req.body keys:", Object.keys(req.body || {}));
+    console.log("🟢 req.file:", req.file ? req.file.filename : "No file uploaded");
 
-    const userId = req.query.id || req.body._id; // ✅ support query param
+    const userId = req.query.id || req.body._id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     const updateFields = {};
-    const allowed = ["name", "username", "bio", "photo", "language", "timezone"];
+    const allowed = ["name", "username", "bio", "language", "timezone"];
+
     for (const key of allowed) {
       if (req.body[key] !== undefined) updateFields[key] = req.body[key];
     }
+
+    // ✅ If photo uploaded, set absolute URL
+    if (req.file) {
+      const host = req.protocol + "://" + req.get("host");
+      updateFields.photo = `${host}/uploads/${req.file.filename}`;
+    }
+
+    console.log("🟢 Fields to update:", updateFields);
 
     const user = await User.findByIdAndUpdate(userId, updateFields, { new: true });
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -221,9 +232,11 @@ export const updateProfile = async (req, res, next) => {
       timezone: user.timezone,
     });
   } catch (err) {
-    next(err);
+    console.error("❌ Update profile error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // Change user password
 export const changePassword = async (req, res, next) => {
