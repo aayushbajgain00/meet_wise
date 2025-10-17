@@ -3,32 +3,32 @@ import React from "react";
 const teamMembers = [
   {
     name: "Aayush Bajgain",
-    role: "Team Lead",
+    role: "Team Lead and FullStack Developer",
     image: "/aayush.png",
   },
   {
     name: "Rachan Phuyal",
-    role: "Product Strategist",
+    role: "AI/ML Developer",
     image: "/rachan.png",
   },
   {
     name: "Abin Tamang",
-    role: "UX Researcher",
+    role: "UI/UX Designer and frontend Developer",
     image: "/abin.png",
   },
   {
     name: "Ashish Roka",
-    role: "AI Engineer",
+    role: "Technical Lead and AI Developer ",
     image: "/aashish.png",
   },
   {
     name: "Bhojraj Basnet",
-    role: "Frontend Developer",
+    role: "Full Stack Developer",
     image: "/bhoj.png",
   },
   {
     name: "Joshan Karki",
-    role: "Customer Success",
+    role: "UI/UX Designer and QA Engineer",
     image: "/joshan.png",
   },
 ];
