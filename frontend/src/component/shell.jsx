@@ -2,11 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome, FaVideo, FaRegFileAlt, FaCalendarAlt,
-  FaCog, FaSignOutAlt, FaChevronDown, FaChevronUp
+  FaCog, FaSignOutAlt, FaChevronDown, FaChevronUp, FaRecordVinyl
 } from "react-icons/fa";
 import { useMsal } from "@azure/msal-react";
-import { FaRecordVinyl } from "react-icons/fa";
-
 
 /* ---------------- Topbar ---------------- */
 function Topbar() {
@@ -40,10 +38,10 @@ export default function Shell() {
   const navigate = useNavigate();
   const location = useLocation();
   const { instance, accounts } = useMsal();
-   // profile state
+
   const [profile, setProfile] = useState(null);
 
-  // Load profile once when Shell mounts
+  // 🔹 Fetch profile on mount and whenever updated
   useEffect(() => {
     async function fetchProfile() {
       try {
@@ -54,6 +52,12 @@ export default function Shell() {
         const res = await fetch(`/api/user/profile?id=${userId}`);
         if (!res.ok) throw new Error("Failed to load profile");
         const data = await res.json();
+
+        // Normalize photo path
+        if (data.photo && !data.photo.startsWith("http") && !data.photo.startsWith("/uploads")) {
+          data.photo = `/uploads/${data.photo}`;
+        }
+
         setProfile(data);
       } catch (err) {
         console.error("Profile load error:", err);
@@ -62,32 +66,51 @@ export default function Shell() {
     fetchProfile();
   }, []);
 
-  // fallback initials
-  const userInitial = profile?.name
-    ? profile.name.slice(0, 1).toUpperCase()
-    : "U";
+  // 🟢 Whenever ProfileSetting updates it (via Outlet context)
+  useEffect(() => {
+    if (profile && profile.photo) {
+      console.log("Profile updated:", profile.photo);
+    }
+  }, [profile]);
 
+  // Derived UI values
   const profileName = profile?.name || "User";
-  const profilePhoto = profile?.photo;
+  const userInitial = profileName.slice(0, 1).toUpperCase();
+ const profilePhoto = (() => {
+  if (!profile?.photo) return null;
 
-  // // Name from MSAL → localStorage → fallback
-  // const activeAcc = instance.getActiveAccount?.() || accounts?.[0];
-  // const profileName =
-  //   activeAcc?.name ||
-  //   activeAcc?.idTokenClaims?.name ||
-  //   localStorage.getItem("mw_user_name") ||
-  //   "User";
-  // const userInitial = (profileName || "U").slice(0, 1).toUpperCase();
+  // 🟢 If it's a local preview from ProfileSetting.jsx
+  if (profile.photo.startsWith("blob:")) return profile.photo;
 
-  // Dropdown open state – auto-open on route
+  // 🟢 If backend returned relative path like "uploads/xyz.jpg"
+  if (profile.photo.startsWith("uploads/"))
+    return `${window.location.origin}/${profile.photo}`;
+
+  // 🟢 If backend returned "/uploads/xyz.jpg"
+  if (profile.photo.startsWith("/uploads/"))
+    return `${window.location.origin}${profile.photo}`;
+
+  // 🟢 If backend returned full URL already (http://localhost:5000/uploads/xyz.jpg)
+  if (profile.photo.startsWith("http")) return profile.photo;
+
+  return null;
+})();
+
+  //   const profilePhoto =
+  // profile?.photo && profile.photo.startsWith("blob:")
+  //   ? profile.photo // preview from ProfileSetting
+  //   : profile?.photo || null;
+
+
+  // Dropdown open states
   const [meetingsOpen, setMeetingsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
   useEffect(() => {
     setMeetingsOpen(location.pathname.startsWith(`${APP_BASE}/meetings`));
     setSettingsOpen(location.pathname.startsWith(`${APP_BASE}/settings`));
   }, [location.pathname]);
 
-  // Tailwind utility groups
   const activePill =
     "relative bg-white ring-1 ring-[#cfe0ff] text-[#0f3d8d] shadow-sm before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-6 before:w-1.5 before:rounded-r-full before:bg-[#4F83E0]";
   const baseRow =
@@ -139,27 +162,28 @@ export default function Shell() {
             <div className="flex flex-col h-full rounded-3xl border border-[#eee] bg-[#f5f3f3]/60 p-3 shadow-sm">
               {/* Profile */}
               <div className="mb-3 flex items-center gap-3">
-                {profilePhoto ? (
-                  <img
-                    src={profilePhoto}
-                    alt="Profile"
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="grid h-10 w-10 place-items-center rounded-full bg-[#4F83E0] font-bold text-white">
-                    {userInitial}
-                  </div>
-                )}
+               {profilePhoto ? (
+  <img
+    src={profilePhoto}
+    alt="Profile"
+    className="h-10 w-10 rounded-full object-cover border"
+  />
+) : (
+  <div className="grid h-10 w-10 place-items-center rounded-full bg-[#4F83E0] font-bold text-white">
+    {userInitial}
+  </div>
+)}
+
                 <div className="max-w-[150px] truncate text-sm font-semibold">
                   {profileName}
                 </div>
-</div>
+              </div>
+
               <div className="mb-2 h-px w-full bg-[#eaeaea]" />
 
               {/* Scrollable nav area */}
               <div className="flex-1 overflow-y-auto">
                 <nav className="flex flex-col gap-1 pr-1">
-                  {/* Dashboard */}
                   <NavLink
                     to="/app"
                     end
@@ -171,7 +195,6 @@ export default function Shell() {
                     <span>Dashboard</span>
                   </NavLink>
 
-                  {/* Meetings dropdown */}
                   <div className="rounded-xl px-1 py-1">
                     <ParentRow
                       icon={<FaVideo />}
@@ -189,7 +212,6 @@ export default function Shell() {
                     )}
                   </div>
 
-                  {/* Transcripts */}
                   <NavLink
                     to="/app/transcripts"
                     end
@@ -200,20 +222,18 @@ export default function Shell() {
                     <span className="text-[18px] text-[#232B3B]"><FaRegFileAlt /></span>
                     <span>Transcripts</span>
                   </NavLink>
-                  {/* Recordings */}
-<NavLink
-  to="/app/recordings"
-  end
-  className={({ isActive }) =>
-    [baseRow, isActive ? activePill : ""].join(" ")
-  }
->
-  <span className="text-[18px] text-[#232B3B]"><FaRecordVinyl /></span>
-  <span>Recordings</span>
-</NavLink>
 
+                  <NavLink
+                    to="/app/recordings"
+                    end
+                    className={({ isActive }) =>
+                      [baseRow, isActive ? activePill : ""].join(" ")
+                    }
+                  >
+                    <span className="text-[18px] text-[#232B3B]"><FaRecordVinyl /></span>
+                    <span>Recordings</span>
+                  </NavLink>
 
-                  {/* Schedules */}
                   <NavLink
                     to="/app/teams"
                     end
@@ -227,7 +247,6 @@ export default function Shell() {
 
                   <div className="my-2 h-px w-full bg-[#eaeaea]" />
 
-                  {/* Settings dropdown */}
                   <div className="rounded-xl px-1 py-1">
                     <ParentRow
                       icon={<FaCog />}
@@ -240,7 +259,6 @@ export default function Shell() {
                     {settingsOpen && (
                       <div id="settings-submenu" className="mt-1 flex flex-col gap-1">
                         <ChildLink to="/app/settings/profile" label="Profile Settings" />
-                        <ChildLink to="/app/settings/meeting" label="Meetings Settings" />
                         <ChildLink to="/app/settings/account" label="Account Settings" />
                       </div>
                     )}
@@ -258,14 +276,14 @@ export default function Shell() {
                   className="flex w-full items-center gap-3 rounded-xl px-4 py-3 font-semibold text-[#d24a43] hover:bg-white/70"
                 >
                   <span className="text-[18px]"><FaSignOutAlt /></span>
-                  <span>Logout </span>
+                  <span>Logout</span>
                 </button>
               </div>
             </div>
           </div>
         </aside>
 
-        {/* Main routed content */}
+        {/* Main content */}
         <main className="flex-1 h-full py-6 px-4 overflow-auto">
           <Outlet context={{ profile, setProfile }} />
         </main>
